@@ -4,8 +4,8 @@
  *
  * Renders the full package detail page: itinerary, inclusions/exclusions,
  * pricing, hotel tier, meal plan, vehicle options, gallery, WhatsApp
- * click-to-chat, the package inquiry form, and the Route Stops map.
- * Advisory callout is out of scope here (ticket 08).
+ * click-to-chat, the package inquiry form, the Route Stops map, and the
+ * Mountain Advisory callout.
  */
 
 /**
@@ -33,6 +33,7 @@ while ( have_posts() ) :
 	$itinerary_content      = get_field( 'itinerary_content' );
 	$inclusions             = get_field( 'inclusions' );
 	$exclusions             = get_field( 'exclusions' );
+	$mountain_advisory_content = get_field( 'mountain_advisory_content' );
 
 	$vehicle_options_field = get_field_object( 'vehicle_options' );
 	$hotel_tier_field      = get_field_object( 'hotel_tier' );
@@ -129,6 +130,13 @@ while ( have_posts() ) :
 				// The map container's own markup, safely built by uttarakhand_tours_render_route_map().
 				echo uttarakhand_tours_render_route_map( $route_stops );
 				?>
+			</div>
+		<?php endif; ?>
+
+		<?php if ( $mountain_advisory_content ) : ?>
+			<div class="package-mountain-advisory">
+				<h2>Mountain Advisory</h2>
+				<?php echo wp_kses_post( $mountain_advisory_content ); ?>
 			</div>
 		<?php endif; ?>
 

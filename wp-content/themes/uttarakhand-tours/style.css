@@ -20,3 +20,9 @@ Text Domain: uttarakhand-tours
 .package-route-map {
 	height: 400px;
 }
+
+.package-mountain-advisory {
+	border-left: 4px solid #c0392b;
+	background: #fdf2f0;
+	padding: 1em 1.5em;
+}
