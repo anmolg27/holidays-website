@@ -47,6 +47,18 @@ while ( have_posts() ) :
 	$package_title         = get_the_title( $post_id );
 	$whatsapp_floating_link = uttarakhand_tours_get_whatsapp_link( sprintf( "Hi, I'm interested in the %s package.", $package_title ) );
 	$whatsapp_inquire_link  = uttarakhand_tours_get_whatsapp_link( sprintf( "Hi, I'd like to enquire about the %s package.", $package_title ) );
+
+	// Rendered up front so the summary block can decide whether to offer a
+	// jump link to it, and so an unavailable form leaves no empty section.
+	$package_inquiry_form_html = uttarakhand_tours_render_package_inquiry_form( $post_id, $package_title );
+
+	$has_package_summary = (
+		$package_price
+		|| $package_duration
+		|| $pickup_drop_location
+		|| ( ! empty( $regions ) && ! is_wp_error( $regions ) )
+		|| ( ! empty( $themes ) && ! is_wp_error( $themes ) )
+	);
 	?>
 
 	<?php if ( $whatsapp_floating_link ) : ?>
@@ -66,36 +78,44 @@ while ( have_posts() ) :
 			<?php the_content(); ?>
 		</div>
 
-		<?php if ( $package_price ) : ?>
-			<p class="package-price">Starting from &#8377;<?php echo esc_html( number_format_i18n( $package_price ) ); ?></p>
-		<?php endif; ?>
+		<?php if ( $has_package_summary ) : ?>
+			<div class="package-summary">
+				<?php if ( $package_price ) : ?>
+					<p class="package-price">Starting from &#8377;<?php echo esc_html( number_format_i18n( $package_price ) ); ?></p>
+				<?php endif; ?>
 
-		<?php if ( $package_duration ) : ?>
-			<p class="package-duration"><?php echo esc_html( $package_duration ); ?></p>
-		<?php endif; ?>
+				<?php if ( $package_duration ) : ?>
+					<p class="package-duration"><?php echo esc_html( $package_duration ); ?></p>
+				<?php endif; ?>
 
-		<?php if ( $pickup_drop_location ) : ?>
-			<p class="package-pickup-drop-location">Pickup / Drop: <?php echo esc_html( $pickup_drop_location ); ?></p>
-		<?php endif; ?>
+				<?php if ( $pickup_drop_location ) : ?>
+					<p class="package-pickup-drop-location">Pickup / Drop: <?php echo esc_html( $pickup_drop_location ); ?></p>
+				<?php endif; ?>
 
-		<?php if ( ! empty( $regions ) && ! is_wp_error( $regions ) ) : ?>
-			<ul class="package-regions">
-				<?php foreach ( $regions as $region ) : ?>
-					<li class="package-region"><?php echo esc_html( $region->name ); ?></li>
-				<?php endforeach; ?>
-			</ul>
-		<?php endif; ?>
+				<?php if ( ! empty( $regions ) && ! is_wp_error( $regions ) ) : ?>
+					<ul class="package-regions">
+						<?php foreach ( $regions as $region ) : ?>
+							<li class="package-region"><?php echo esc_html( $region->name ); ?></li>
+						<?php endforeach; ?>
+					</ul>
+				<?php endif; ?>
 
-		<?php if ( ! empty( $themes ) && ! is_wp_error( $themes ) ) : ?>
-			<ul class="package-themes">
-				<?php foreach ( $themes as $theme ) : ?>
-					<li class="package-theme"><?php echo esc_html( $theme->name ); ?></li>
-				<?php endforeach; ?>
-			</ul>
+				<?php if ( ! empty( $themes ) && ! is_wp_error( $themes ) ) : ?>
+					<ul class="package-themes">
+						<?php foreach ( $themes as $theme ) : ?>
+							<li class="package-theme"><?php echo esc_html( $theme->name ); ?></li>
+						<?php endforeach; ?>
+					</ul>
+				<?php endif; ?>
+
+				<?php if ( $package_inquiry_form_html ) : ?>
+					<a class="package-summary-inquire" href="#package-inquiry">Send an inquiry</a>
+				<?php endif; ?>
+			</div>
 		<?php endif; ?>
 
 		<div class="package-vehicle-options">
-			<h2>Vehicle Options</h2>
+			<h2>Vehicle options</h2>
 			<?php if ( ! empty( $vehicle_options_field['value'] ) ) : ?>
 				<ul>
 					<?php foreach ( (array) $vehicle_options_field['value'] as $vehicle_option ) : ?>
@@ -108,12 +128,18 @@ while ( have_posts() ) :
 			<p class="package-toll-parking-included">Toll &amp; Parking Included: <?php echo esc_html( $toll_parking_included ? 'Yes' : 'No' ); ?></p>
 		</div>
 
-		<?php if ( ! empty( $hotel_tier_field['value'] ) ) : ?>
-			<p class="package-hotel-tier">Hotel Tier: <?php echo esc_html( uttarakhand_tours_get_field_choice_label( $hotel_tier_field, $hotel_tier_field['value'] ) ); ?></p>
-		<?php endif; ?>
+		<?php if ( ! empty( $hotel_tier_field['value'] ) || ! empty( $meal_plan_field['value'] ) ) : ?>
+			<div class="package-stay">
+				<h2>Stay and meals</h2>
 
-		<?php if ( ! empty( $meal_plan_field['value'] ) ) : ?>
-			<p class="package-meal-plan">Meal Plan: <?php echo esc_html( uttarakhand_tours_get_field_choice_label( $meal_plan_field, $meal_plan_field['value'] ) ); ?></p>
+				<?php if ( ! empty( $hotel_tier_field['value'] ) ) : ?>
+					<p class="package-hotel-tier">Hotel Tier: <?php echo esc_html( uttarakhand_tours_get_field_choice_label( $hotel_tier_field, $hotel_tier_field['value'] ) ); ?></p>
+				<?php endif; ?>
+
+				<?php if ( ! empty( $meal_plan_field['value'] ) ) : ?>
+					<p class="package-meal-plan">Meal Plan: <?php echo esc_html( uttarakhand_tours_get_field_choice_label( $meal_plan_field, $meal_plan_field['value'] ) ); ?></p>
+				<?php endif; ?>
+			</div>
 		<?php endif; ?>
 
 		<?php if ( $itinerary_content ) : ?>
@@ -154,17 +180,26 @@ while ( have_posts() ) :
 			</div>
 		<?php endif; ?>
 
-		<?php if ( $whatsapp_inquire_link ) : ?>
-			<a class="whatsapp-inquire-cta" href="<?php echo esc_url( $whatsapp_inquire_link ); ?>" target="_blank" rel="noopener noreferrer">Inquire About This Package</a>
-		<?php endif; ?>
+		<?php if ( $package_inquiry_form_html ) : ?>
+			<div class="package-inquiry-form" id="package-inquiry">
+				<h2>Inquire about this package</h2>
 
-		<div class="package-inquiry-form">
-			<h2>Inquire About This Package</h2>
-			<?php
-			// Contact Form 7's own form_html() output — trusted plugin markup, not user input.
-			echo uttarakhand_tours_render_package_inquiry_form( $post_id, $package_title );
-			?>
-		</div>
+				<p class="package-inquiry-note">Tell us your dates and group size and we will come back to you with a plan. Nothing is reserved until we have spoken.</p>
+
+				<?php
+				// Contact Form 7's own form_html() output — trusted plugin markup, not user input.
+				echo $package_inquiry_form_html;
+				?>
+
+				<?php if ( $whatsapp_inquire_link ) : ?>
+					<p class="package-inquiry-alternative">Prefer to chat?
+						<a class="whatsapp-inquire-cta" href="<?php echo esc_url( $whatsapp_inquire_link ); ?>" target="_blank" rel="noopener noreferrer">Ask on WhatsApp</a>
+					</p>
+				<?php endif; ?>
+			</div>
+		<?php elseif ( $whatsapp_inquire_link ) : ?>
+			<a class="whatsapp-inquire-cta" href="<?php echo esc_url( $whatsapp_inquire_link ); ?>" target="_blank" rel="noopener noreferrer">Ask on WhatsApp</a>
+		<?php endif; ?>
 	</article>
 
 <?php

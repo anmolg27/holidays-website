@@ -10,29 +10,126 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: uttarakhand-tours
 */
 
-.whatsapp-floating-button {
-	position: fixed;
-	bottom: 20px;
-	right: 20px;
-	z-index: 100;
-}
-
-.package-route-map {
-	height: 400px;
-}
-
-.package-mountain-advisory {
-	border-left: 4px solid #c0392b;
-	background: #fdf2f0;
-	padding: 1em 1.5em;
-}
-
 /**
  * Responsive layout, mobile-first (base styles target small screens, then
  * widened at the tablet/desktop breakpoints below). No UI framework — the
  * whole site is served by this one stylesheet, kept deliberately light for
- * 3G/4G mountain connections (see ticket 13).
+ * 3G/4G mountain connections (see ticket 13). Two webfonts total, both
+ * variable, both swapped in without blocking first paint.
+ *
+ * Contents
+ *   1. Design tokens
+ *   2. Reset and base
+ *   3. Typography
+ *   4. Controls: links, buttons, form fields
+ *   5. Page container and landmarks
+ *   6. Site header and footer
+ *   7. Homepage
+ *   8. Package cards and archive
+ *   9. Single Travel Package
+ *  10. Motion and print
  */
+
+
+/* ==========================================================================
+   1. Design tokens
+   ========================================================================== */
+
+:root {
+	/* Ink and ground. One gray family throughout: every neutral is tinted
+	   with the same forest hue, so nothing reads as a stray warm or cool
+	   gray next to the saffron accent. */
+	--ut-forest-900: #0f1a16;
+	--ut-forest-800: #16241f;
+	--ut-forest-700: #1e332c;
+	--ut-forest-600: #2a3f37;
+	--ut-slate-600: #3d4e47;
+	--ut-slate-500: #5b6d65;
+	--ut-slate-400: #8a9992;
+	--ut-slate-300: #bcc7c1;
+	--ut-slate-200: #dbe2de;
+	--ut-slate-100: #eaefec;
+	--ut-glacier: #f5f8f6;
+	--ut-white: #fff;
+
+	/* A single accent, in three roles: a fill you put dark text on, a
+	   darker cut for accent text on light ground, and a tint for surfaces. */
+	--ut-saffron: #e08a28;
+	--ut-saffron-deep: #a85a12;
+	--ut-saffron-soft: #faeedc;
+	--ut-alert: #a32b1c;
+
+	/* Semantic roles. Components reference these, not the raw ramp. */
+	--ut-ground: var( --ut-glacier );
+	--ut-surface: var( --ut-white );
+	--ut-ink: var( --ut-forest-800 );
+	--ut-ink-strong: var( --ut-forest-900 );
+	--ut-ink-muted: var( --ut-slate-500 );
+	--ut-ink-inverse: #eef3f0;
+	--ut-line: var( --ut-slate-200 );
+	--ut-line-strong: var( --ut-slate-300 );
+
+	--ut-font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+	--ut-font-ui: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+	/* Fluid type scale. Every step interpolates between a mobile and a
+	   desktop size, so there is no breakpoint where text jumps. */
+	--ut-step--2: clamp( 0.75rem, 0.735rem + 0.07vw, 0.79rem );
+	--ut-step--1: clamp( 0.8125rem, 0.79rem + 0.11vw, 0.875rem );
+	--ut-step-0: clamp( 1rem, 0.97rem + 0.15vw, 1.0625rem );
+	--ut-step-1: clamp( 1.125rem, 1.07rem + 0.28vw, 1.3rem );
+	--ut-step-2: clamp( 1.35rem, 1.22rem + 0.62vw, 1.8rem );
+	--ut-step-3: clamp( 1.7rem, 1.44rem + 1.25vw, 2.5rem );
+	--ut-step-4: clamp( 2.1rem, 1.62rem + 2.3vw, 3.6rem );
+	--ut-step-5: clamp( 2.6rem, 1.72rem + 4.2vw, 5.2rem );
+
+	--ut-space-3xs: 0.25rem;
+	--ut-space-2xs: 0.5rem;
+	--ut-space-xs: 0.75rem;
+	--ut-space-s: 1rem;
+	--ut-space-m: 1.5rem;
+	--ut-space-l: 2.25rem;
+	--ut-space-xl: 3.5rem;
+	--ut-space-2xl: 5rem;
+
+	/* Sections read as distinct chapters rather than a continuous scroll. */
+	--ut-section: clamp( 3.75rem, 2.2rem + 6.2vw, 7rem );
+
+	--ut-radius-s: 6px;
+	--ut-radius-m: 12px;
+	--ut-radius-l: 20px;
+	--ut-radius-pill: 999px;
+
+	/* Shadows carry the ground's hue instead of neutral black, and all
+	   share one light source: above, slightly front. */
+	--ut-shadow-1: 0 1px 2px rgba( 15, 26, 22, 0.05 ), 0 2px 8px rgba( 15, 26, 22, 0.04 );
+	--ut-shadow-2: 0 2px 4px rgba( 15, 26, 22, 0.06 ), 0 14px 30px -10px rgba( 15, 26, 22, 0.16 );
+	--ut-shadow-3: 0 30px 60px -26px rgba( 15, 26, 22, 0.4 );
+
+	--ut-ease: cubic-bezier( 0.2, 0.7, 0.3, 1 );
+	--ut-fast: 140ms;
+	--ut-mid: 260ms;
+	--ut-slow: 600ms;
+
+	--ut-content: 71rem;
+	--ut-measure: 62ch;
+	--ut-gutter: clamp( 1.25rem, 0.8rem + 2.2vw, 3rem );
+
+	/* A named z-scale, so no component has to invent a number. */
+	--ut-z-raised: 1;
+	--ut-z-sticky: 20;
+	--ut-z-float: 30;
+	--ut-z-skip: 100;
+
+	/* Fine grain, tiled from one 140px SVG so the browser rasterizes it
+	   once. Breaks up the flat dark surfaces without a raster download. */
+	--ut-grain: url( "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E" );
+}
+
+
+/* ==========================================================================
+   2. Reset and base
+   ========================================================================== */
 
 *,
 *::before,
@@ -40,110 +137,1780 @@ Text Domain: uttarakhand-tours
 	box-sizing: border-box;
 }
 
+html {
+	-webkit-text-size-adjust: 100%;
+}
+
 body {
 	margin: 0;
-	font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-	line-height: 1.5;
+	background: var( --ut-ground );
+	color: var( --ut-ink );
+	font-family: var( --ut-font-ui );
+	font-size: var( --ut-step-0 );
+	font-weight: 400;
+	line-height: 1.6;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	overflow-x: hidden;
 }
 
-img {
+img,
+svg,
+video {
 	max-width: 100%;
 	height: auto;
+	display: block;
 }
 
-.page-title,
-.package-title {
-	margin: 0.5em 0;
+/* Anything that can overflow its column scrolls inside itself rather than
+   widening the page. */
+table,
+pre {
+	display: block;
+	max-width: 100%;
+	overflow-x: auto;
 }
 
-/* Card grids: single column on mobile, more columns as space allows. */
-.package-cards,
-.testimonials-list,
-.sitewide-gallery,
-.popular-regions,
+hr {
+	border: 0;
+	border-top: 1px solid var( --ut-line );
+	margin: var( --ut-space-l ) 0;
+}
+
+::selection {
+	background: var( --ut-saffron );
+	color: var( --ut-forest-900 );
+}
+
+:focus-visible {
+	outline: 2px solid var( --ut-saffron-deep );
+	outline-offset: 3px;
+	border-radius: 2px;
+}
+
+
+/* ==========================================================================
+   3. Typography
+   ========================================================================== */
+
+:where( h1, h2, h3, h4, h5, h6 ) {
+	margin: 0 0 var( --ut-space-s );
+	color: var( --ut-ink-strong );
+	font-family: var( --ut-font-display );
+	font-optical-sizing: auto;
+	font-weight: 600;
+	line-height: 1.08;
+	letter-spacing: -0.015em;
+	text-wrap: balance;
+}
+
+:where( h1 ) {
+	font-size: var( --ut-step-4 );
+}
+
+:where( h2 ) {
+	font-size: var( --ut-step-3 );
+}
+
+:where( h3 ) {
+	font-size: var( --ut-step-2 );
+	line-height: 1.15;
+}
+
+:where( h4, h5, h6 ) {
+	font-size: var( --ut-step-1 );
+	line-height: 1.25;
+	letter-spacing: -0.005em;
+}
+
+:where( p, ul, ol, dl, blockquote ) {
+	margin: 0 0 var( --ut-space-s );
+}
+
+:where( p ) {
+	text-wrap: pretty;
+}
+
+/* Long-form prose gets a reading measure; form and layout paragraphs are
+   left alone so field rows stay full width. */
+:where(
+	.page-content,
+	.package-itinerary,
+	.package-inclusions,
+	.package-exclusions,
+	.package-mountain-advisory,
+	.homepage-hero,
+	.package-archive-header,
+	.package-gallery,
+	.site-footer-brand
+) :where( p, li ) {
+	max-width: var( --ut-measure );
+}
+
+.package-archive-count,
+.package-gallery .gallery-caption {
+	max-width: none;
+}
+
+:where( blockquote ) {
+	margin-inline: 0;
+	padding-left: var( --ut-space-m );
+	border-left: 2px solid var( --ut-saffron );
+	font-family: var( --ut-font-display );
+	font-size: var( --ut-step-1 );
+	font-style: italic;
+	color: var( --ut-forest-700 );
+}
+
+:where( strong, b ) {
+	font-weight: 700;
+}
+
+:where( small ) {
+	font-size: var( --ut-step--1 );
+}
+
+:where( code, kbd, samp ) {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 0.9em;
+}
+
+/* Figures read as data, not prose: aligned columns beat proportional. */
+.package-price,
+.package-card-price,
+.package-card-duration,
+.package-duration {
+	font-variant-numeric: tabular-nums;
+}
+
+/* The one micro-label treatment in the system: tracked, semibold, small.
+   Used only for meta lines, never for section headings. */
+.package-card-regions,
+.package-archive-filters legend,
+.package-archive-count,
+.site-brand-tagline,
+.trust-badge,
+.testimonial-name {
+	font-size: var( --ut-step--1 );
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+
+/* ==========================================================================
+   4. Controls: links, buttons, form fields
+   ========================================================================== */
+
+a {
+	color: var( --ut-saffron-deep );
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.22em;
+	transition: color var( --ut-fast ) var( --ut-ease );
+}
+
+a:hover {
+	color: var( --ut-forest-800 );
+}
+
+/* Shared button surface. Applied to the theme's existing CTA classes and to
+   the submit controls Contact Form 7 renders, so no template needs a new
+   class attribute. */
+.hero-filter-form button,
+.package-archive-filters button,
+.package-inquiry-form input[type="submit"],
+.contact-request-form input[type="submit"],
+.whatsapp-inquire-cta,
+.whatsapp-contact-cta,
+.whatsapp-floating-button,
+.site-header-cta,
+.package-summary-inquire {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var( --ut-space-2xs );
+	min-height: 3rem;
+	padding: 0.75rem 1.5rem;
+	border: 1px solid transparent;
+	border-radius: var( --ut-radius-pill );
+	font-family: var( --ut-font-ui );
+	font-size: var( --ut-step-0 );
+	font-weight: 600;
+	line-height: 1.2;
+	text-align: center;
+	text-decoration: none;
+	cursor: pointer;
+	transition:
+		background-color var( --ut-fast ) var( --ut-ease ),
+		border-color var( --ut-fast ) var( --ut-ease ),
+		color var( --ut-fast ) var( --ut-ease ),
+		box-shadow var( --ut-mid ) var( --ut-ease ),
+		transform var( --ut-fast ) var( --ut-ease );
+}
+
+/* Primary: the saffron fill carries dark forest text, which clears AA
+   comfortably where white would not. */
+.hero-filter-form button,
+.package-archive-filters button,
+.package-inquiry-form input[type="submit"],
+.contact-request-form input[type="submit"],
+.package-summary-inquire {
+	background: var( --ut-saffron );
+	color: var( --ut-forest-900 );
+	box-shadow: var( --ut-shadow-1 );
+}
+
+.hero-filter-form button:hover,
+.package-archive-filters button:hover,
+.package-inquiry-form input[type="submit"]:hover,
+.contact-request-form input[type="submit"]:hover,
+.package-summary-inquire:hover {
+	background: #eb9a3e;
+	color: var( --ut-forest-900 );
+	box-shadow: var( --ut-shadow-2 );
+}
+
+.hero-filter-form button:active,
+.package-archive-filters button:active,
+.package-inquiry-form input[type="submit"]:active,
+.contact-request-form input[type="submit"]:active,
+.package-summary-inquire:active {
+	transform: translateY( 1px );
+	box-shadow: var( --ut-shadow-1 );
+}
+
+/* Secondary: the second contact channel, deliberately quieter than the
+   form's own submit so the two never compete at equal weight. */
+.whatsapp-inquire-cta,
+.whatsapp-contact-cta,
+.site-header-cta {
+	background: transparent;
+	border-color: var( --ut-line-strong );
+	color: var( --ut-forest-800 );
+}
+
+.whatsapp-inquire-cta:hover,
+.whatsapp-contact-cta:hover,
+.site-header-cta:hover {
+	background: var( --ut-white );
+	border-color: var( --ut-forest-800 );
+	color: var( --ut-forest-900 );
+	box-shadow: var( --ut-shadow-1 );
+}
+
+.whatsapp-inquire-cta:active,
+.whatsapp-contact-cta:active,
+.site-header-cta:active {
+	transform: translateY( 1px );
+}
+
+/* Form fields. One field surface across the hero filter bar, the archive
+   filter bar, and both Contact Form 7 forms. */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="url"],
+input[type="number"],
+input[type="date"],
+input[type="search"],
+select,
+textarea {
+	width: 100%;
+	min-height: 3rem;
+	padding: 0.6rem 0.85rem;
+	background: var( --ut-white );
+	border: 1px solid var( --ut-line-strong );
+	border-radius: var( --ut-radius-s );
+	color: var( --ut-ink );
+	font-family: var( --ut-font-ui );
+	font-size: var( --ut-step-0 );
+	line-height: 1.4;
+	transition:
+		border-color var( --ut-fast ) var( --ut-ease ),
+		box-shadow var( --ut-fast ) var( --ut-ease );
+}
+
+textarea {
+	min-height: 8rem;
+	padding: 0.75rem 0.85rem;
+	resize: vertical;
+}
+
+select {
+	appearance: none;
+	padding-right: 2.25rem;
+	background-image: url( "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%235b6d65' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" );
+	background-repeat: no-repeat;
+	background-position: right 0.85rem center;
+	cursor: pointer;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+	border-color: var( --ut-slate-400 );
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+	outline: none;
+	border-color: var( --ut-saffron-deep );
+	box-shadow: 0 0 0 3px rgba( 224, 138, 40, 0.28 );
+}
+
+::placeholder {
+	color: var( --ut-slate-400 );
+	opacity: 1;
+}
+
+
+/* ==========================================================================
+   5. Page container and landmarks
+   ========================================================================== */
+
+.skip-link {
+	position: absolute;
+	left: var( --ut-space-s );
+	top: var( --ut-space-s );
+	z-index: var( --ut-z-skip );
+	padding: 0.75rem 1.25rem;
+	background: var( --ut-forest-900 );
+	border-radius: var( --ut-radius-s );
+	color: var( --ut-ink-inverse );
+	font-size: var( --ut-step--1 );
+	font-weight: 600;
+	text-decoration: none;
+	transform: translateY( -150% );
+	transition: transform var( --ut-fast ) var( --ut-ease );
+}
+
+.skip-link:focus {
+	transform: translateY( 0 );
+	color: var( --ut-ink-inverse );
+}
+
+/* The page container. A named-line grid gives every direct child the
+   content column by default, and lets the hero opt into full bleed —
+   without a wrapper element inside each template. */
+.site-main {
+	display: grid;
+	grid-template-columns:
+		[full-start] minmax( var( --ut-gutter ), 1fr )
+		[content-start] minmax( 0, var( --ut-content ) )
+		[content-end] minmax( var( --ut-gutter ), 1fr )
+		[full-end];
+	row-gap: var( --ut-section );
+	padding-block: var( --ut-section ) calc( var( --ut-section ) * 1.2 );
+}
+
+.site-main > * {
+	grid-column: content;
+	min-width: 0;
+}
+
+.site-main > .homepage-hero {
+	grid-column: full;
+}
+
+/* The hero already carries its own generous internal padding. */
+.home .site-main {
+	padding-block-start: 0;
+}
+
+/* Anchored jumps clear the sticky header. */
+:target {
+	scroll-margin-top: 6rem;
+}
+
+
+/* ==========================================================================
+   6. Site header and footer
+   ========================================================================== */
+
+.site-header {
+	position: sticky;
+	top: 0;
+	z-index: var( --ut-z-sticky );
+	background: var( --ut-ground );
+	border-bottom: 1px solid var( --ut-line );
+}
+
+.site-header-inner {
+	max-width: var( --ut-content );
+	margin-inline: auto;
+	padding: var( --ut-space-xs ) var( --ut-gutter );
+	display: grid;
+	grid-template-columns: minmax( 0, 1fr ) auto;
+	align-items: center;
+	column-gap: var( --ut-space-m );
+	row-gap: var( --ut-space-3xs );
+}
+
+.site-brand-link {
+	display: grid;
+	gap: 0.1rem;
+	text-decoration: none;
+	color: inherit;
+}
+
+.site-brand-name {
+	font-family: var( --ut-font-display );
+	font-size: var( --ut-step-1 );
+	font-weight: 700;
+	letter-spacing: -0.022em;
+	line-height: 1.1;
+	color: var( --ut-forest-900 );
+}
+
+.site-brand-tagline {
+	font-size: var( --ut-step--2 );
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	color: var( --ut-slate-500 );
+}
+
+.site-brand .custom-logo {
+	max-height: 3rem;
+	width: auto;
+}
+
+/* On small screens the nav drops to its own row and scrolls sideways.
+   With three or four destinations that beats a hamburger: nothing to open,
+   nothing to script, and every item stays one tap away. */
+.site-nav {
+	grid-column: 1 / -1;
+	min-width: 0;
+}
+
+.site-nav-list,
+.site-footer-nav-list,
+.site-footer-reach-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.site-nav-list {
+	display: flex;
+	gap: var( --ut-space-m );
+	overflow-x: auto;
+	scrollbar-width: none;
+	-webkit-overflow-scrolling: touch;
+}
+
+.site-nav-list::-webkit-scrollbar {
+	display: none;
+}
+
+.site-nav-list a {
+	display: block;
+	padding: 0.4rem 0;
+	border-bottom: 2px solid transparent;
+	color: var( --ut-slate-600 );
+	font-size: var( --ut-step--1 );
+	font-weight: 600;
+	text-decoration: none;
+	white-space: nowrap;
+	transition:
+		color var( --ut-fast ) var( --ut-ease ),
+		border-color var( --ut-fast ) var( --ut-ease );
+}
+
+.site-nav-list a:hover {
+	color: var( --ut-forest-900 );
+	border-bottom-color: var( --ut-line-strong );
+}
+
+.site-nav-list .current-menu-item > a,
+.site-nav-list a[aria-current="page"] {
+	color: var( --ut-forest-900 );
+	border-bottom-color: var( --ut-saffron );
+}
+
+.site-header-cta {
+	min-height: 2.5rem;
+	padding: 0.45rem 1.15rem;
+	font-size: var( --ut-step--1 );
+}
+
+@media ( min-width: 900px ) {
+	.site-header-inner {
+		grid-template-columns: auto minmax( 0, 1fr ) auto;
+		padding-block: var( --ut-space-s );
+	}
+
+	.site-nav {
+		grid-column: auto;
+		justify-self: center;
+	}
+
+	.site-nav-list {
+		gap: var( --ut-space-l );
+	}
+}
+
+.site-footer {
+	position: relative;
+	isolation: isolate;
+	background: var( --ut-forest-900 );
+	color: rgba( 238, 243, 240, 0.7 );
+	font-size: var( --ut-step--1 );
+}
+
+.site-footer::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	background-image: var( --ut-grain );
+	background-size: 140px 140px;
+	opacity: 0.05;
+	pointer-events: none;
+}
+
+.site-footer-inner {
+	max-width: var( --ut-content );
+	margin-inline: auto;
+	padding: var( --ut-space-2xl ) var( --ut-gutter ) var( --ut-space-xl );
+	display: grid;
+	gap: var( --ut-space-xl );
+}
+
+.site-footer-name {
+	margin-bottom: var( --ut-space-2xs );
+	font-family: var( --ut-font-display );
+	font-size: var( --ut-step-2 );
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	line-height: 1.15;
+	color: #f2f6f4;
+}
+
+.site-footer-brand p:last-child {
+	margin-bottom: 0;
+	font-size: var( --ut-step-0 );
+	line-height: 1.65;
+}
+
+.site-footer-columns {
+	display: grid;
+	gap: var( --ut-space-xl );
+}
+
+.site-footer-heading {
+	margin-bottom: var( --ut-space-s );
+	font-family: var( --ut-font-ui );
+	font-size: var( --ut-step--2 );
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: rgba( 238, 243, 240, 0.45 );
+}
+
+.site-footer-nav-list,
+.site-footer-reach-list {
+	display: grid;
+	gap: var( --ut-space-2xs );
+}
+
+.site-footer a {
+	color: #e9efec;
+	text-decoration-color: rgba( 233, 239, 236, 0.3 );
+}
+
+.site-footer a:hover {
+	color: var( --ut-saffron );
+	text-decoration-color: currentColor;
+}
+
+.site-footer-address {
+	color: rgba( 238, 243, 240, 0.62 );
+}
+
+.site-footer-legal {
+	max-width: var( --ut-content );
+	margin-inline: auto;
+	padding: var( --ut-space-m ) var( --ut-gutter ) var( --ut-space-xl );
+	border-top: 1px solid rgba( 238, 243, 240, 0.12 );
+	color: rgba( 238, 243, 240, 0.52 );
+	font-size: var( --ut-step--2 );
+	display: grid;
+	gap: 0.3rem;
+}
+
+.site-footer-legal p {
+	margin: 0;
+	max-width: 70ch;
+}
+
+@media ( min-width: 820px ) {
+	.site-footer-inner {
+		grid-template-columns: minmax( 0, 1.35fr ) minmax( 0, 1fr );
+		gap: var( --ut-space-2xl );
+	}
+
+	.site-footer-columns {
+		grid-template-columns: repeat( 2, minmax( 0, 1fr ) );
+		gap: var( --ut-space-l );
+	}
+
+	.site-footer-legal {
+		grid-template-columns: auto 1fr;
+		gap: var( --ut-space-m );
+		align-items: baseline;
+	}
+}
+
+
+/* ==========================================================================
+   7. Homepage hero
+   ========================================================================== */
+
+/* The hero's atmosphere is drawn, not downloaded: a dawn wash over a
+   forest gradient, a two-layer ridgeline where the far ridge is lighter
+   than the near one, and a tiled grain. No image request, and it scales to
+   any viewport. */
+.homepage-hero {
+	position: relative;
+	isolation: isolate;
+	overflow: hidden;
+	padding: clamp( 3.5rem, 2.4rem + 6.5vw, 7rem ) var( --ut-gutter ) clamp( 5.5rem, 3.5rem + 9vw, 10rem );
+	background-color: var( --ut-forest-800 );
+	background-image:
+		radial-gradient( 120% 68% at 50% 84%, rgba( 224, 138, 40, 0.28 ), rgba( 224, 138, 40, 0 ) 62% ),
+		linear-gradient( 180deg, #22392f 0%, #16241f 52%, #0f1a16 100% );
+	color: var( --ut-ink-inverse );
+	text-align: center;
+}
+
+.homepage-hero::before {
+	content: "";
+	position: absolute;
+	inset: auto 0 0 0;
+	z-index: -1;
+	height: 52%;
+	background-image: url( "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 400' preserveAspectRatio='none'%3E%3Cpath fill='%232f4740' d='M0 400V300l90-32 90 24 120-82 80-42 90 68 90-22 100 48 100-30 100-36 80-46 100 72 100 30 100-44 100 38 100-20V400z'/%3E%3Cpath fill='%23223731' d='M0 400V336l120-24 110 28 100-48 110 30 100-46 100 38 100-26 110 42 100-30 110 36 100-30 110 34 110-24 60 14V400z'/%3E%3Cpath fill='%230d1815' d='M0 400v-28l160-14 160 18 160-24 160 20 160-26 160 22 160-18 160 22 160-16V400z'/%3E%3C/svg%3E" );
+	background-repeat: no-repeat;
+	background-position: bottom center;
+	background-size: 260% 100%;
+	pointer-events: none;
+}
+
+@media ( min-width: 720px ) {
+	.homepage-hero::before {
+		background-size: 100% 100%;
+	}
+}
+
+.homepage-hero::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	background-image: var( --ut-grain );
+	background-size: 140px 140px;
+	opacity: 0.055;
+	pointer-events: none;
+}
+
+.homepage-hero-inner {
+	position: relative;
+	max-width: var( --ut-content );
+	margin-inline: auto;
+}
+
+/* Sized and measured so the headline lands in two lines on a desktop and
+   three on a phone, never a six-line wall. */
+.homepage-hero h1 {
+	max-width: 26ch;
+	margin-inline: auto;
+	margin-bottom: var( --ut-space-m );
+	font-size: clamp( 2.05rem, 1.25rem + 4.1vw, 5rem );
+	font-weight: 600;
+	line-height: 1.02;
+	letter-spacing: -0.028em;
+	color: #f4f8f6;
+}
+
+.homepage-hero-lede {
+	max-width: 54ch;
+	margin-inline: auto;
+	margin-bottom: 0;
+	color: rgba( 238, 243, 240, 0.76 );
+	font-size: var( --ut-step-1 );
+	line-height: 1.6;
+}
+
+/* A glacier-white panel resting on the dark hero: the one surface on the
+   page that reads as an instrument rather than a card. */
+.hero-filter-form {
+	display: grid;
+	gap: var( --ut-space-s );
+	max-width: 52rem;
+	margin: clamp( 2rem, 1.4rem + 2.4vw, 3.25rem ) auto 0;
+	padding: var( --ut-space-s );
+	background: rgba( 245, 248, 246, 0.95 );
+	border: 1px solid rgba( 255, 255, 255, 0.16 );
+	border-radius: var( --ut-radius-l );
+	box-shadow: var( --ut-shadow-3 );
+	text-align: left;
+}
+
+.hero-filter-field {
+	display: grid;
+	gap: 0.35rem;
+	min-width: 0;
+}
+
+.hero-filter-label {
+	font-size: var( --ut-step--2 );
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var( --ut-slate-500 );
+}
+
+@media ( min-width: 720px ) {
+	.hero-filter-form {
+		grid-template-columns: minmax( 0, 1fr ) minmax( 0, 1fr ) auto;
+		align-items: end;
+		gap: var( --ut-space-m );
+		padding: var( --ut-space-m );
+	}
+}
+
+
+/* ==========================================================================
+   7b. Homepage sections
+   ========================================================================== */
+
+/* One section-heading treatment across the homepage: a heavy rule, then
+   the display serif. It does the job a "SECTION 01" label would, without
+   the label. */
+.site-main > section > h2 {
+	margin-bottom: var( --ut-space-l );
+	padding-top: var( --ut-space-s );
+	border-top: 2px solid var( --ut-forest-900 );
+}
+
+.site-main > section > h2:not( :first-child ) {
+	margin-top: var( --ut-space-2xl );
+}
+
+.popular-regions {
+	display: grid;
+	grid-template-columns: repeat( auto-fill, minmax( min( 100%, 13rem ), 1fr ) );
+	gap: var( --ut-space-s );
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.popular-region a {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var( --ut-space-s );
+	min-height: 5.75rem;
+	padding: var( --ut-space-m );
+	background: var( --ut-forest-800 );
+	border-radius: var( --ut-radius-m );
+	color: #eef3f0;
+	font-family: var( --ut-font-display );
+	font-size: var( --ut-step-1 );
+	font-weight: 600;
+	letter-spacing: -0.015em;
+	line-height: 1.15;
+	text-decoration: none;
+	transition:
+		background-color var( --ut-mid ) var( --ut-ease ),
+		transform var( --ut-mid ) var( --ut-ease ),
+		box-shadow var( --ut-mid ) var( --ut-ease );
+}
+
+.popular-region a::after {
+	content: "";
+	flex: none;
+	width: 0.55rem;
+	height: 0.55rem;
+	border-top: 2px solid var( --ut-saffron );
+	border-right: 2px solid var( --ut-saffron );
+	transform: rotate( 45deg );
+	transition: transform var( --ut-mid ) var( --ut-ease );
+}
+
+.popular-region a:hover {
+	background: var( --ut-forest-700 );
+	color: #fff;
+	transform: translateY( -2px );
+	box-shadow: var( --ut-shadow-2 );
+}
+
+.popular-region a:hover::after {
+	transform: rotate( 45deg ) translate( 2px, -2px );
+}
+
+/* Not cards: a ruled ledger row. Four bordered boxes here would read as
+   the same component as the package grid, which they are not. */
 .trust-badges {
 	display: grid;
 	grid-template-columns: 1fr;
-	gap: 1.5em;
+	gap: 0;
+	margin: 0;
 	padding: 0;
-	margin: 1em 0;
 	list-style: none;
+	border-top: 1px solid var( --ut-line );
 }
 
-.package-card,
-.testimonial {
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	padding: 1em;
+.trust-badge {
+	padding: var( --ut-space-m ) 0;
+	border-bottom: 1px solid var( --ut-line );
+	color: var( --ut-forest-800 );
+	letter-spacing: 0.06em;
+	font-variant-numeric: tabular-nums;
 }
 
-.package-card-regions,
-.package-card-themes,
-.package-regions,
-.package-themes {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.5em;
-	padding: 0;
-	margin: 0.5em 0;
-	list-style: none;
+.trust-badge::before {
+	content: "";
+	display: block;
+	width: 1.75rem;
+	height: 2px;
+	margin-bottom: 0.7rem;
+	background: var( --ut-saffron );
 }
 
-/* Forms: full-width fields on mobile. */
-.hero-filter-form,
-.package-inquiry-form form,
-.contact-request-form form {
-	display: flex;
-	flex-direction: column;
-	gap: 1em;
-	max-width: 40em;
-}
-
-.hero-filter-form label {
-	display: flex;
-	flex-direction: column;
-	gap: 0.25em;
-}
-
-.homepage-hero {
-	padding: 2em 1em;
-}
-
-.whatsapp-inquire-cta,
-.whatsapp-contact-cta {
-	display: inline-block;
-	margin: 1em 0;
-}
-
-@media ( min-width: 640px ) {
-	.package-cards,
-	.sitewide-gallery,
-	.popular-regions,
+@media ( min-width: 720px ) {
 	.trust-badges {
-		grid-template-columns: repeat( 2, 1fr );
-	}
-
-	.hero-filter-form {
-		flex-direction: row;
-		align-items: flex-end;
-		flex-wrap: wrap;
+		grid-template-columns: repeat( 2, minmax( 0, 1fr ) );
+		column-gap: var( --ut-space-l );
 	}
 }
 
 @media ( min-width: 1024px ) {
-	body {
-		max-width: 75em;
-		margin: 0 auto;
+	.trust-badges {
+		grid-template-columns: repeat( 4, minmax( 0, 1fr ) );
+		border-bottom: 1px solid var( --ut-line );
 	}
 
-	.package-cards,
-	.sitewide-gallery {
-		grid-template-columns: repeat( 3, 1fr );
+	.trust-badge {
+		padding: var( --ut-space-l ) 0 var( --ut-space-l ) var( --ut-space-m );
+		border-bottom: 0;
+		border-left: 1px solid var( --ut-line );
 	}
 
-	.popular-regions,
-	.trust-badges,
+	.trust-badge:first-child {
+		padding-left: 0;
+		border-left: 0;
+	}
+}
+
+
+/* ==========================================================================
+   8. Package cards and archive
+   ========================================================================== */
+
+/* auto-fill rather than fixed breakpoint columns: the grid holds its own
+   at any package count, and the homepage's six featured packages land as
+   two complete rows of three with no empty cells. */
+.package-cards {
+	display: grid;
+	grid-template-columns: repeat( auto-fill, minmax( min( 100%, 18rem ), 1fr ) );
+	gap: clamp( 1.25rem, 1rem + 1.2vw, 2rem );
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.package-card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	background: var( --ut-surface );
+	border-radius: var( --ut-radius-l );
+	overflow: hidden;
+	box-shadow: var( --ut-shadow-1 );
+	transition:
+		transform var( --ut-mid ) var( --ut-ease ),
+		box-shadow var( --ut-mid ) var( --ut-ease );
+}
+
+.package-card:hover {
+	transform: translateY( -4px );
+	box-shadow: var( --ut-shadow-2 );
+}
+
+/* The link keeps its own accessible name; the card just shows the ring. */
+.package-card:focus-within {
+	box-shadow: var( --ut-shadow-2 ), 0 0 0 3px rgba( 224, 138, 40, 0.55 );
+}
+
+.package-card-link {
+	display: block;
+	color: inherit;
+	text-decoration: none;
+}
+
+.package-card-link:focus-visible {
+	outline: none;
+}
+
+/* Makes the whole card the hit target without nesting a second link. */
+.package-card-link::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: var( --ut-z-raised );
+}
+
+.package-card-link img {
+	width: 100%;
+	aspect-ratio: 4 / 3;
+	object-fit: cover;
+	background: var( --ut-slate-100 );
+	transition: transform var( --ut-slow ) var( --ut-ease );
+}
+
+.package-card:hover .package-card-link img {
+	transform: scale( 1.055 );
+}
+
+.package-card-title {
+	margin: 0;
+	padding: var( --ut-space-m ) var( --ut-space-m ) 0;
+	font-size: var( --ut-step-2 );
+	line-height: 1.14;
+	letter-spacing: -0.018em;
+}
+
+.package-card-regions,
+.package-card-themes,
+.package-card-duration,
+.package-card-price {
+	padding-inline: var( --ut-space-m );
+}
+
+.package-card > :last-child {
+	padding-bottom: var( --ut-space-m );
+}
+
+/* The two taxonomies are set in different voices so the card reads as one
+   line of classification rather than two identical rows of pills. */
+.package-card-regions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.2rem 0.7rem;
+	margin: var( --ut-space-xs ) 0 0;
+	list-style: none;
+	color: var( --ut-saffron-deep );
+}
+
+.package-card-themes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.2rem 0.5rem;
+	margin: 0.25rem 0 0;
+	list-style: none;
+	font-family: var( --ut-font-display );
+	font-size: var( --ut-step--1 );
+	font-style: italic;
+	color: var( --ut-ink-muted );
+}
+
+.package-card-theme:not( :first-child )::before {
+	content: "· ";
+}
+
+/* Whichever of duration/price the package has gets pushed to the bottom,
+   so every card in a row lands its figures on the same baseline. */
+.package-card-duration,
+.package-card-price {
+	margin: auto 0 0;
+	padding-top: var( --ut-space-s );
+	border-top: 1px solid var( --ut-line );
+}
+
+.package-card-duration {
+	color: var( --ut-ink-muted );
+	font-size: var( --ut-step--1 );
+	font-weight: 600;
+	letter-spacing: 0.04em;
+}
+
+.package-card-price {
+	color: var( --ut-forest-900 );
+	font-family: var( --ut-font-display );
+	font-size: var( --ut-step-1 );
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+
+.package-card-duration + .package-card-price {
+	margin-top: 0.1rem;
+	padding-top: 0;
+	border-top: 0;
+}
+
+.package-archive-header {
+	margin-bottom: var( --ut-space-xl );
+}
+
+.package-archive-lede {
+	color: var( --ut-ink-muted );
+	font-size: var( --ut-step-1 );
+}
+
+.package-archive-filters {
+	display: grid;
+	gap: var( --ut-space-s );
+	margin: var( --ut-space-l ) 0 var( --ut-space-m );
+	padding: var( --ut-space-s );
+	background: var( --ut-surface );
+	border: 1px solid var( --ut-line );
+	border-radius: var( --ut-radius-m );
+	box-shadow: var( --ut-shadow-1 );
+}
+
+.package-archive-field {
+	display: grid;
+	gap: 0.35rem;
+	min-width: 0;
+}
+
+.package-archive-label {
+	font-size: var( --ut-step--2 );
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var( --ut-slate-500 );
+}
+
+.package-archive-count {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: var( --ut-space-s );
+	margin: 0;
+	padding-bottom: var( --ut-space-s );
+	border-bottom: 1px solid var( --ut-line );
+	color: var( --ut-ink-muted );
+}
+
+.package-archive-clear {
+	font-weight: 600;
+	letter-spacing: 0.02em;
+	text-transform: none;
+}
+
+.package-archive-empty {
+	padding: var( --ut-space-xl ) var( --ut-space-m );
+	background: var( --ut-surface );
+	border: 1px dashed var( --ut-line-strong );
+	border-radius: var( --ut-radius-l );
+	text-align: center;
+}
+
+.package-archive-empty p {
+	margin-inline: auto;
+}
+
+.package-archive-empty-title {
+	margin-bottom: 0.4rem;
+	color: var( --ut-forest-900 );
+	font-family: var( --ut-font-display );
+	font-size: var( --ut-step-2 );
+	font-weight: 600;
+	letter-spacing: -0.015em;
+}
+
+.package-archive-empty-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: var( --ut-space-s );
+	margin-top: var( --ut-space-m );
+}
+
+/* Two reserved title lines keep the meta rows of neighbouring cards on a
+   shared baseline. Single-column, there is no neighbour to align to. */
+@media ( min-width: 640px ) {
+	.package-card-title {
+		min-height: calc( 2.28em + var( --ut-space-m ) );
+	}
+}
+
+@media ( min-width: 720px ) {
+	.package-archive-filters {
+		grid-template-columns: minmax( 0, 1fr ) minmax( 0, 1fr ) auto;
+		align-items: end;
+		gap: var( --ut-space-m );
+		padding: var( --ut-space-m );
+	}
+}
+
+
+/* ==========================================================================
+   9. Single Travel Package, forms, testimonials and gallery
+   ========================================================================== */
+
+.page-title,
+.package-title {
+	margin: 0 0 var( --ut-space-m );
+}
+
+.package-title {
+	max-width: 22ch;
+}
+
+.package-featured-image {
+	margin-block: var( --ut-space-l );
+	border-radius: var( --ut-radius-l );
+	overflow: hidden;
+	box-shadow: var( --ut-shadow-2 );
+}
+
+.package-featured-image img {
+	width: 100%;
+	aspect-ratio: 3 / 2;
+	max-height: 30rem;
+	object-fit: cover;
+	background: var( --ut-slate-100 );
+}
+
+/* The spec strip. Five loose paragraphs used to carry equal weight here;
+   now the figure leads and everything else reads as its annotation. */
+.package-summary {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var( --ut-space-s ) var( --ut-space-l );
+	margin: var( --ut-space-l ) 0 var( --ut-space-xl );
+	padding: var( --ut-space-m );
+	background: var( --ut-surface );
+	border: 1px solid var( --ut-line );
+	border-radius: var( --ut-radius-l );
+	box-shadow: var( --ut-shadow-1 );
+}
+
+.package-summary > * {
+	margin: 0;
+}
+
+.package-price {
+	color: var( --ut-forest-900 );
+	font-family: var( --ut-font-display );
+	font-size: var( --ut-step-3 );
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	line-height: 1.05;
+}
+
+.package-duration,
+.package-pickup-drop-location {
+	color: var( --ut-ink-muted );
+	font-size: var( --ut-step--1 );
+	font-weight: 600;
+	letter-spacing: 0.03em;
+}
+
+.package-regions,
+.package-themes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.2rem 0.6rem;
+	padding: 0;
+	list-style: none;
+}
+
+.package-regions {
+	color: var( --ut-saffron-deep );
+	font-size: var( --ut-step--1 );
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.package-themes {
+	color: var( --ut-ink-muted );
+	font-family: var( --ut-font-display );
+	font-style: italic;
+}
+
+.package-theme:not( :first-child )::before {
+	content: "· ";
+}
+
+.package-summary-inquire {
+	width: 100%;
+}
+
+@media ( min-width: 820px ) {
+	.package-summary {
+		gap: var( --ut-space-m ) var( --ut-space-xl );
+		padding: var( --ut-space-l );
+	}
+
+	.package-summary-inquire {
+		width: auto;
+		margin-left: auto;
+	}
+}
+
+/* One section rule across the package page, matching the homepage. */
+.package-vehicle-options > h2,
+.package-stay > h2,
+.package-itinerary > h2,
+.package-route > h2,
+.package-inclusions > h2,
+.package-exclusions > h2 {
+	margin-bottom: var( --ut-space-m );
+	padding-top: var( --ut-space-s );
+	border-top: 2px solid var( --ut-forest-900 );
+	font-size: var( --ut-step-3 );
+}
+
+.package-vehicle-options,
+.package-stay,
+.package-itinerary,
+.package-route,
+.package-inclusions,
+.package-exclusions {
+	margin-block: var( --ut-space-xl );
+}
+
+/* Selectable options, so a chip is the honest shape here — unlike a
+   decorative badge. */
+.package-vehicle-options ul {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin: 0 0 var( --ut-space-m );
+	padding: 0;
+	list-style: none;
+}
+
+.package-vehicle-options li {
+	padding: 0.45rem 1rem;
+	background: var( --ut-slate-100 );
+	border-radius: var( --ut-radius-pill );
+	color: var( --ut-forest-800 );
+	font-size: var( --ut-step--1 );
+	font-weight: 600;
+}
+
+.package-driver-allowance-included,
+.package-toll-parking-included,
+.package-hotel-tier,
+.package-meal-plan {
+	margin: 0;
+	padding: 0.7rem 0;
+	border-bottom: 1px solid var( --ut-line );
+	color: var( --ut-forest-800 );
+}
+
+.package-itinerary :where( h2, h3, h4 ) {
+	margin-top: var( --ut-space-l );
+	font-size: var( --ut-step-1 );
+}
+
+.package-inclusions ul,
+.package-exclusions ul {
+	padding-left: 0;
+	list-style: none;
+}
+
+.package-inclusions li,
+.package-exclusions li {
+	position: relative;
+	margin-bottom: 0.45rem;
+	padding-left: 1.6rem;
+}
+
+.package-inclusions li::before {
+	content: "";
+	position: absolute;
+	left: 0.1rem;
+	top: 0.5em;
+	width: 0.7rem;
+	height: 0.38rem;
+	border-left: 2px solid var( --ut-saffron-deep );
+	border-bottom: 2px solid var( --ut-saffron-deep );
+	transform: rotate( -45deg );
+}
+
+.package-exclusions li::before {
+	content: "";
+	position: absolute;
+	left: 0.1rem;
+	top: 0.72em;
+	width: 0.7rem;
+	height: 2px;
+	background: var( --ut-slate-400 );
+}
+
+.package-route-map {
+	height: clamp( 18rem, 13rem + 18vw, 26rem );
+	background: var( --ut-slate-100 );
+	border: 1px solid var( --ut-line );
+	border-radius: var( --ut-radius-m );
+	overflow: hidden;
+}
+
+/* Road, weather and permit notes — attention, not alarm. Reusing the one
+   accent keeps it inside the palette instead of introducing a second. */
+.package-mountain-advisory {
+	margin: var( --ut-space-xl ) 0;
+	padding: var( --ut-space-m ) var( --ut-space-m ) var( --ut-space-m ) var( --ut-space-l );
+	background: var( --ut-saffron-soft );
+	border: 1px solid #ecd9bc;
+	border-left: 4px solid var( --ut-saffron-deep );
+	border-radius: 0 var( --ut-radius-m ) var( --ut-radius-m ) 0;
+	color: #4a3a22;
+}
+
+.package-mountain-advisory h2 {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	margin-bottom: var( --ut-space-2xs );
+	color: var( --ut-saffron-deep );
+	font-family: var( --ut-font-ui );
+	font-size: var( --ut-step--1 );
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+.package-mountain-advisory h2::before {
+	content: "";
+	flex: none;
+	width: 0.55rem;
+	height: 0.55rem;
+	border-radius: 50%;
+	background: var( --ut-saffron-deep );
+}
+
+.package-mountain-advisory :last-child {
+	margin-bottom: 0;
+}
+
+/* --- Lead capture -------------------------------------------------------- */
+
+.package-inquiry-form,
+.contact-request-form {
+	margin-block: var( --ut-space-xl );
+	padding: var( --ut-space-l ) var( --ut-space-m );
+	background: var( --ut-surface );
+	border: 1px solid var( --ut-line );
+	border-top: 3px solid var( --ut-saffron );
+	border-radius: var( --ut-radius-l );
+	box-shadow: var( --ut-shadow-2 );
+}
+
+.package-inquiry-form > h2,
+.contact-request-form > h2 {
+	margin-bottom: var( --ut-space-2xs );
+}
+
+.package-inquiry-note {
+	margin-bottom: var( --ut-space-m );
+	max-width: var( --ut-measure );
+	color: var( --ut-ink-muted );
+}
+
+.package-inquiry-form form,
+.contact-request-form form {
+	display: grid;
+	gap: var( --ut-space-m );
+}
+
+.package-inquiry-form form p,
+.contact-request-form form p {
+	margin: 0;
+}
+
+.package-inquiry-form label,
+.contact-request-form label {
+	display: grid;
+	gap: 0.4rem;
+	color: var( --ut-slate-500 );
+	font-size: var( --ut-step--2 );
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+/* The label carries the micro-label treatment; the control must not. */
+.package-inquiry-form label :where( input, select, textarea ),
+.contact-request-form label :where( input, select, textarea ) {
+	color: var( --ut-ink );
+	font-size: var( --ut-step-0 );
+	font-weight: 400;
+	letter-spacing: normal;
+	text-transform: none;
+}
+
+.package-inquiry-form input[type="submit"],
+.contact-request-form input[type="submit"] {
+	width: auto;
+	min-width: 12rem;
+	justify-self: start;
+}
+
+.package-inquiry-form fieldset,
+.contact-request-form fieldset {
+	margin: 0;
+	padding: var( --ut-space-m );
+	background: var( --ut-glacier );
+	border: 1px solid var( --ut-line );
+	border-radius: var( --ut-radius-m );
+}
+
+.package-inquiry-form legend,
+.contact-request-form legend {
+	padding-inline: 0.5rem;
+	color: var( --ut-forest-900 );
+	font-size: var( --ut-step--2 );
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+.package-inquiry-form fieldset > *,
+.contact-request-form fieldset > * {
+	margin-bottom: var( --ut-space-m );
+}
+
+.package-inquiry-form fieldset > :last-child,
+.contact-request-form fieldset > :last-child {
+	margin-bottom: 0;
+}
+
+.contact-request-form > h2 {
+	margin-bottom: var( --ut-space-m );
+}
+
+.package-inquiry-alternative {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var( --ut-space-s );
+	margin: var( --ut-space-l ) 0 0;
+	padding-top: var( --ut-space-m );
+	border-top: 1px solid var( --ut-line );
+	color: var( --ut-ink-muted );
+	font-size: var( --ut-step--1 );
+}
+
+/* Contact Form 7 ships its own stylesheet on these two page types, so a
+   few of its defaults need overriding at the same weight. */
+.wpcf7-not-valid {
+	border-color: var( --ut-alert ) !important;
+}
+
+.wpcf7-not-valid-tip {
+	margin-top: 0.35rem;
+	color: var( --ut-alert );
+	font-size: var( --ut-step--1 );
+	font-weight: 600;
+	letter-spacing: normal;
+	text-transform: none;
+}
+
+.wpcf7-response-output {
+	grid-column: 1 / -1;
+	margin: 0 !important;
+	padding: var( --ut-space-s ) var( --ut-space-m ) !important;
+	background: var( --ut-slate-100 );
+	border: 1px solid var( --ut-line-strong ) !important;
+	border-left: 4px solid var( --ut-slate-400 ) !important;
+	border-radius: var( --ut-radius-s );
+	font-size: var( --ut-step--1 );
+}
+
+.wpcf7 form.invalid .wpcf7-response-output,
+.wpcf7 form.unaccepted .wpcf7-response-output,
+.wpcf7 form.payment-required .wpcf7-response-output {
+	background: #fbeeeb;
+	border-left-color: var( --ut-alert ) !important;
+	color: #6d2114;
+}
+
+.wpcf7 form.sent .wpcf7-response-output {
+	background: #eaf3ee;
+	border-left-color: #2f6b4f !important;
+	color: #1f4a37;
+}
+
+.wpcf7-spinner {
+	margin: 0 0 0 var( --ut-space-s );
+}
+
+/* Two columns once there is room, with the notes field and the submit
+   spanning the full width so the form never reads as two stacks. */
+@supports selector( :has( * ) ) {
+	@media ( min-width: 720px ) {
+		.contact-request-form form {
+			grid-template-columns: repeat( 2, minmax( 0, 1fr ) );
+		}
+
+		.contact-request-form form > p:has( textarea ),
+		.contact-request-form form > label:has( textarea ),
+		.contact-request-form form > p:has( fieldset ),
+		.contact-request-form form > fieldset,
+		.contact-request-form form > p:has( input[type="submit"] ),
+		.contact-request-form form > .wpcf7-response-output {
+			grid-column: 1 / -1;
+		}
+	}
+}
+
+.contact-lede {
+	max-width: var( --ut-measure );
+	color: var( --ut-ink-muted );
+	font-size: var( --ut-step-1 );
+}
+
+.contact-details {
+	display: grid;
+	gap: 0.35rem;
+	margin: var( --ut-space-l ) 0;
+	padding: var( --ut-space-m );
+	background: var( --ut-surface );
+	border: 1px solid var( --ut-line );
+	border-radius: var( --ut-radius-m );
+}
+
+.contact-details p {
+	margin: 0;
+	max-width: none;
+}
+
+.contact-phone,
+.contact-email {
+	font-weight: 600;
+}
+
+.contact-address {
+	color: var( --ut-ink-muted );
+}
+
+.whatsapp-contact-cta {
+	margin-bottom: var( --ut-space-l );
+}
+
+.whatsapp-floating-button {
+	position: fixed;
+	right: var( --ut-gutter );
+	bottom: calc( var( --ut-space-s ) + env( safe-area-inset-bottom, 0px ) );
+	z-index: var( --ut-z-float );
+	min-height: 2.85rem;
+	padding: 0.6rem 1.25rem;
+	background: var( --ut-forest-900 );
+	border-color: var( --ut-forest-900 );
+	color: #eef3f0;
+	font-size: var( --ut-step--1 );
+	box-shadow: var( --ut-shadow-3 );
+}
+
+.whatsapp-floating-button:hover {
+	background: var( --ut-forest-700 );
+	border-color: var( --ut-forest-700 );
+	color: #fff;
+}
+
+.whatsapp-floating-button:active {
+	transform: translateY( 1px );
+}
+
+/* --- Testimonials and galleries ------------------------------------------ */
+
+/* A masonry wall rather than a row of equal-height cards or a carousel:
+   quotes vary in length, and forcing them to match flattens all of them. */
+.testimonials-list {
+	columns: 1;
+	column-gap: var( --ut-space-m );
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.testimonial {
+	break-inside: avoid;
+	margin: 0 0 var( --ut-space-m );
+	padding: var( --ut-space-m );
+	background: var( --ut-surface );
+	border-radius: var( --ut-radius-m );
+	box-shadow: var( --ut-shadow-1 );
+}
+
+.testimonial-photo:empty {
+	display: none;
+}
+
+.testimonial-photo img {
+	width: 3.25rem;
+	height: 3.25rem;
+	object-fit: cover;
+	border-radius: 10px;
+}
+
+.testimonial-name {
+	margin: 0.75rem 0 0.5rem;
+	color: var( --ut-slate-500 );
+}
+
+.testimonial-quote {
+	color: var( --ut-forest-800 );
+	font-family: var( --ut-font-display );
+	font-size: var( --ut-step-1 );
+	line-height: 1.45;
+}
+
+.testimonial-quote::before {
+	content: "\201C";
+	display: block;
+	margin-bottom: 0.3rem;
+	color: var( --ut-saffron );
+	font-family: var( --ut-font-display );
+	font-size: 2.5rem;
+	line-height: 0.55;
+}
+
+.testimonial-quote :last-child {
+	margin-bottom: 0;
+}
+
+@media ( min-width: 720px ) {
 	.testimonials-list {
-		grid-template-columns: repeat( 4, 1fr );
+		columns: 2;
+	}
+}
+
+@media ( min-width: 1024px ) {
+	.testimonials-list {
+		columns: 3;
+	}
+}
+
+/* A contact sheet: tight, square, uniform. Trip photos carry the section,
+   so the frame around them stays out of the way. */
+.sitewide-gallery,
+.package-gallery .gallery {
+	display: grid;
+	grid-template-columns: repeat( auto-fit, minmax( min( 100%, 9rem ), 14rem ) );
+	justify-content: start;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.sitewide-gallery-image,
+.package-gallery .gallery-item {
+	margin: 0 !important;
+	width: auto !important;
+	overflow: hidden;
+	border-radius: var( --ut-radius-s );
+}
+
+.sitewide-gallery-image img,
+.package-gallery .gallery img {
+	width: 100%;
+	aspect-ratio: 1;
+	object-fit: cover;
+	background: var( --ut-slate-100 );
+	border: 0 !important;
+	transition: transform var( --ut-slow ) var( --ut-ease );
+}
+
+.sitewide-gallery-image:hover img,
+.package-gallery .gallery-item:hover img {
+	transform: scale( 1.06 );
+}
+
+.package-gallery {
+	margin-block: var( --ut-space-l );
+}
+
+.package-gallery .gallery-icon {
+	margin: 0;
+}
+
+.package-gallery .gallery-caption {
+	padding: 0.35rem 0.15rem 0;
+	color: var( --ut-ink-muted );
+	font-size: var( --ut-step--2 );
+}
+
+/* --- Editorial pages ----------------------------------------------------- */
+
+.page-content > :first-child {
+	margin-top: 0;
+}
+
+.page-content :where( h2 ) {
+	margin-top: var( --ut-space-xl );
+	padding-top: var( --ut-space-s );
+	border-top: 1px solid var( --ut-line );
+}
+
+.page-content :where( img ) {
+	border-radius: var( --ut-radius-m );
+}
+
+
+/* ==========================================================================
+   10. Motion and print
+   ========================================================================== */
+
+@media ( prefers-reduced-motion: no-preference ) {
+	html {
+		scroll-behavior: smooth;
+	}
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+
+	.package-card:hover,
+	.popular-region a:hover {
+		transform: none;
+	}
+
+	.package-card:hover .package-card-link img,
+	.sitewide-gallery-image:hover img,
+	.package-gallery .gallery-item:hover img {
+		transform: none;
+	}
+}
+
+@media print {
+	.site-header,
+	.site-footer,
+	.skip-link,
+	.whatsapp-floating-button,
+	.hero-filter-form,
+	.package-archive-filters,
+	.package-inquiry-form,
+	.contact-request-form {
+		display: none !important;
+	}
+
+	body {
+		background: #fff;
+		color: #000;
+	}
+
+	.site-main {
+		display: block;
+		padding: 0;
 	}
 }

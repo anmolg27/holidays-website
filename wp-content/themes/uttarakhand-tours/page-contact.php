@@ -22,6 +22,8 @@ while ( have_posts() ) :
 	<article <?php post_class(); ?>>
 		<h1 class="page-title"><?php the_title(); ?></h1>
 
+		<p class="contact-lede">Tell us where you want to go and when. We answer on WhatsApp or over the phone, usually the same day, and put a plan together from there.</p>
+
 		<?php if ( $contact_phone || $contact_email || $contact_address ) : ?>
 			<div class="contact-details">
 				<?php if ( $contact_phone ) : ?>
@@ -43,7 +45,7 @@ while ( have_posts() ) :
 		<?php endif; ?>
 
 		<div class="contact-request-form">
-			<h2>Request a Custom Package</h2>
+			<h2>Request a custom package</h2>
 			<?php
 			// Contact Form 7's own form_html() output — trusted plugin markup, not user input.
 			echo uttarakhand_tours_render_custom_package_request_form();
