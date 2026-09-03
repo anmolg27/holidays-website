@@ -3,17 +3,19 @@
  * Single Travel Package template.
  *
  * Renders the full package detail page: itinerary, inclusions/exclusions,
- * pricing, hotel tier, meal plan, vehicle options, and gallery. Map,
- * advisory callout, WhatsApp, and lead-capture forms are out of scope here
- * (tickets 05-08).
+ * pricing, hotel tier, meal plan, vehicle options, gallery, and WhatsApp
+ * click-to-chat. Map, advisory callout, and lead-capture forms are out of
+ * scope here (tickets 06-08).
  */
 
 /**
  * Resolves an ACF choice field (select/checkbox) value to its human-readable
  * label, falling back to the raw value if no matching choice is found.
  */
-function uttarakhand_tours_get_field_choice_label( $field, $value ) {
-	return $field['choices'][ $value ] ?? $value;
+if ( ! function_exists( 'uttarakhand_tours_get_field_choice_label' ) ) {
+	function uttarakhand_tours_get_field_choice_label( $field, $value ) {
+		return $field['choices'][ $value ] ?? $value;
+	}
 }
 
 get_header();
@@ -38,7 +40,15 @@ while ( have_posts() ) :
 
 	$regions = get_the_terms( $post_id, 'package_region' );
 	$themes  = get_the_terms( $post_id, 'package_theme' );
+
+	$package_title         = get_the_title( $post_id );
+	$whatsapp_floating_link = uttarakhand_tours_get_whatsapp_link( sprintf( "Hi, I'm interested in the %s package.", $package_title ) );
+	$whatsapp_inquire_link  = uttarakhand_tours_get_whatsapp_link( sprintf( "Hi, I'd like to enquire about the %s package.", $package_title ) );
 	?>
+
+	<?php if ( $whatsapp_floating_link ) : ?>
+		<a class="whatsapp-floating-button" href="<?php echo esc_url( $whatsapp_floating_link ); ?>" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
+	<?php endif; ?>
 
 	<article <?php post_class(); ?>>
 		<h1 class="package-title"><?php the_title(); ?></h1>
@@ -122,6 +132,10 @@ while ( have_posts() ) :
 				<h2>Exclusions</h2>
 				<?php echo wp_kses_post( $exclusions ); ?>
 			</div>
+		<?php endif; ?>
+
+		<?php if ( $whatsapp_inquire_link ) : ?>
+			<a class="whatsapp-inquire-cta" href="<?php echo esc_url( $whatsapp_inquire_link ); ?>" target="_blank" rel="noopener noreferrer">Inquire About This Package</a>
 		<?php endif; ?>
 	</article>
 
