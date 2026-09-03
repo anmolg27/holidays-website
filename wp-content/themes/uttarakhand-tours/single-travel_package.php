@@ -4,8 +4,8 @@
  *
  * Renders the full package detail page: itinerary, inclusions/exclusions,
  * pricing, hotel tier, meal plan, vehicle options, gallery, WhatsApp
- * click-to-chat, and the package inquiry form. Map and advisory callout are
- * out of scope here (tickets 07-08).
+ * click-to-chat, the package inquiry form, and the Route Stops map.
+ * Advisory callout is out of scope here (ticket 08).
  */
 
 /**
@@ -40,6 +40,8 @@ while ( have_posts() ) :
 
 	$regions = get_the_terms( $post_id, 'package_region' );
 	$themes  = get_the_terms( $post_id, 'package_theme' );
+
+	$route_stops = uttarakhand_tours_parse_route_stops( get_field( 'route_stops' ) );
 
 	$package_title         = get_the_title( $post_id );
 	$whatsapp_floating_link = uttarakhand_tours_get_whatsapp_link( sprintf( "Hi, I'm interested in the %s package.", $package_title ) );
@@ -117,6 +119,16 @@ while ( have_posts() ) :
 			<div class="package-itinerary">
 				<h2>Itinerary</h2>
 				<?php echo wp_kses_post( $itinerary_content ); ?>
+			</div>
+		<?php endif; ?>
+
+		<?php if ( $route_stops ) : ?>
+			<div class="package-route">
+				<h2>Route</h2>
+				<?php
+				// The map container's own markup, safely built by uttarakhand_tours_render_route_map().
+				echo uttarakhand_tours_render_route_map( $route_stops );
+				?>
 			</div>
 		<?php endif; ?>
 

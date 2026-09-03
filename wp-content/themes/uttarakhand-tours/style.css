@@ -16,3 +16,7 @@ Text Domain: uttarakhand-tours
 	right: 20px;
 	z-index: 100;
 }
+
+.package-route-map {
+	height: 400px;
+}
