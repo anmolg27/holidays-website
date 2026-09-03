@@ -1,0 +1,3 @@
+# Lead generation only — no online booking or payment
+
+The site never takes payment or confirms availability itself. Every "book now" path — WhatsApp click-to-chat, the per-package inquiry form, and the open-ended Custom Package Request form — ends in a manually-followed-up Lead, not a completed transaction. This keeps `package_price` a simple admin-entered "starting from" value with no pricing engine, and avoids building booking/availability/payment infrastructure for a business that's validating its first website. Adding real online booking later is a major re-architecture (payment gateway, availability calendar, order management), not a toggle.
