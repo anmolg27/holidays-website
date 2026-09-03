@@ -98,45 +98,9 @@ $packages = new WP_Query( $query_args );
 			while ( $packages->have_posts() ) :
 				$packages->the_post();
 
-				$post_id          = get_the_ID();
-				$package_price    = get_field( 'package_price' );
-				$package_duration = get_field( 'package_duration' );
-				$regions          = get_the_terms( $post_id, 'package_region' );
-				$themes           = get_the_terms( $post_id, 'package_theme' );
-				?>
-				<li class="package-card">
-					<a class="package-card-link" href="<?php the_permalink(); ?>">
-						<?php if ( has_post_thumbnail() ) : ?>
-							<?php the_post_thumbnail( 'medium' ); ?>
-						<?php endif; ?>
-						<h2 class="package-card-title"><?php the_title(); ?></h2>
-					</a>
-
-					<?php if ( ! empty( $regions ) && ! is_wp_error( $regions ) ) : ?>
-						<ul class="package-card-regions">
-							<?php foreach ( $regions as $region_term ) : ?>
-								<li class="package-card-region"><?php echo esc_html( $region_term->name ); ?></li>
-							<?php endforeach; ?>
-						</ul>
-					<?php endif; ?>
-
-					<?php if ( ! empty( $themes ) && ! is_wp_error( $themes ) ) : ?>
-						<ul class="package-card-themes">
-							<?php foreach ( $themes as $theme_term ) : ?>
-								<li class="package-card-theme"><?php echo esc_html( $theme_term->name ); ?></li>
-							<?php endforeach; ?>
-						</ul>
-					<?php endif; ?>
-
-					<?php if ( $package_duration ) : ?>
-						<p class="package-card-duration"><?php echo esc_html( $package_duration ); ?></p>
-					<?php endif; ?>
-
-					<?php if ( $package_price ) : ?>
-						<p class="package-card-price">Starting from &#8377;<?php echo esc_html( number_format_i18n( $package_price ) ); ?></p>
-					<?php endif; ?>
-				</li>
-			<?php endwhile; ?>
+				echo uttarakhand_tours_render_package_card( get_the_ID() );
+			endwhile;
+			?>
 		</ul>
 	<?php else : ?>
 		<p class="package-archive-empty">No travel packages match your filters.</p>
