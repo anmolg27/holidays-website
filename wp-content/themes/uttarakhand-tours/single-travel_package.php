@@ -60,6 +60,8 @@ while ( have_posts() ) :
 			<div class="package-featured-image">
 				<?php the_post_thumbnail( 'large' ); ?>
 			</div>
+		<?php else : ?>
+			<div class="package-featured-image-placeholder" aria-hidden="true"></div>
 		<?php endif; ?>
 
 		<div class="package-gallery">

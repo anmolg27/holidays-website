@@ -35,7 +35,9 @@ function uttarakhand_tours_render_testimonials() {
 		// Explicit loading="lazy": these render from get_posts(), not the main
 		// query loop, so WordPress's automatic lazy-loading heuristic never
 		// sees them (see inc/package-card.php for the same reasoning).
-		$photo = has_post_thumbnail( $testimonial ) ? get_the_post_thumbnail( $testimonial, 'thumbnail', array( 'loading' => 'lazy' ) ) : '';
+		$photo = has_post_thumbnail( $testimonial )
+			? get_the_post_thumbnail( $testimonial, 'thumbnail', array( 'loading' => 'lazy' ) )
+			: '<div class="testimonial-photo-placeholder" aria-hidden="true"></div>';
 
 		$items_html .= sprintf(
 			'<li class="testimonial"><div class="testimonial-photo">%s</div><p class="testimonial-name">%s</p><div class="testimonial-quote">%s</div></li>',

@@ -14,6 +14,17 @@ require_once __DIR__ . '/inc/package-card.php';
 require_once __DIR__ . '/inc/performance.php';
 require_once __DIR__ . '/inc/about-fleet-page.php';
 require_once __DIR__ . '/inc/contact-page.php';
+require_once __DIR__ . '/inc/navigation.php';
+
+/**
+ * Lets WordPress generate the document <title> itself (site name, page
+ * title, etc.) via wp_head() — the theme never declared this, so every
+ * page has been missing a real <title> element.
+ */
+function uttarakhand_tours_setup() {
+	add_theme_support( 'title-tag' );
+}
+add_action( 'after_setup_theme', 'uttarakhand_tours_setup' );
 
 function uttarakhand_tours_enqueue_styles() {
 	wp_enqueue_style( 'uttarakhand-tours-style', get_stylesheet_uri(), array(), wp_get_theme()->get( 'Version' ) );

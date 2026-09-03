@@ -29,6 +29,8 @@ function uttarakhand_tours_render_package_card( $post_id, $lazy = true ) {
 		<a class="package-card-link" href="<?php echo esc_url( get_permalink( $post_id ) ); ?>">
 			<?php if ( has_post_thumbnail( $post_id ) ) : ?>
 				<?php echo get_the_post_thumbnail( $post_id, 'medium', array( 'loading' => $lazy ? 'lazy' : 'eager' ) ); ?>
+			<?php else : ?>
+				<div class="package-card-image-placeholder" aria-hidden="true"></div>
 			<?php endif; ?>
 			<h2 class="package-card-title"><?php echo esc_html( get_the_title( $post_id ) ); ?></h2>
 		</a>

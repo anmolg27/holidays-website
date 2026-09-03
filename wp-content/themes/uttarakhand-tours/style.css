@@ -10,29 +10,63 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: uttarakhand-tours
 */
 
-.whatsapp-floating-button {
-	position: fixed;
-	bottom: 20px;
-	right: 20px;
-	z-index: 100;
-}
-
-.package-route-map {
-	height: 400px;
-}
-
-.package-mountain-advisory {
-	border-left: 4px solid #c0392b;
-	background: #fdf2f0;
-	padding: 1em 1.5em;
-}
-
 /**
- * Responsive layout, mobile-first (base styles target small screens, then
- * widened at the tablet/desktop breakpoints below). No UI framework — the
- * whole site is served by this one stylesheet, kept deliberately light for
- * 3G/4G mountain connections (see ticket 13).
+ * Design system: "Prayer-Flag Trail" (see .impeccable/surfaces/ for the
+ * direction contract, docs/adr/0003 for the type stack). Traditional
+ * prayer-flag colors (sky, cloud, fire, water, earth) each own a real UI
+ * role rather than sitting as decoration; the flag-band device is the
+ * site's one signature graphic, repeated with deliberate density, never as
+ * filler texture.
  */
+
+@font-face {
+	font-family: "Lora";
+	font-style: normal;
+	font-weight: 600;
+	font-display: swap;
+	src: url("assets/fonts/lora-600-latin.woff2") format("woff2");
+}
+
+:root {
+	/* Prayer-flag palette — each color owns a UI role, not just a decorative accent. */
+	--flag-blue: #3e6e8e;
+	/* sky — links, secondary interactive */
+	--flag-red: #b8483c;
+	/* fire — primary action */
+	--flag-green: #5c7a46;
+	/* water — included/available/success */
+	--flag-yellow: #d9a441;
+	/* earth — badges, highlights */
+	--flag-white: #ffffff;
+	/* air */
+
+	--ground: #fbf6ec;
+	/* warm hemp-paper ground */
+	--ground-deep: #f1e8d8;
+	/* deeper tone for placeholders/dividers */
+	--surface: #fffdf8;
+	/* card surfaces, slightly warmer than pure white */
+	--ink: #2b2420;
+	/* warm near-black, never pure black */
+	--ink-secondary: #6b5f52;
+	/* tinted from ink, never gray */
+	--border: #e4d9c5;
+
+	--font-display: "Lora", Georgia, "Times New Roman", serif;
+	--font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+	--radius: 14px;
+	--radius-pill: 999px;
+	--shadow-soft: 0 4px 16px rgba(43, 36, 32, 0.1);
+	--shadow-lift: 0 8px 28px rgba(43, 36, 32, 0.16);
+
+	--flag-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='28' viewBox='0 0 100 28'%3E%3Cline x1='0' y1='3' x2='100' y2='3' stroke='%236b5f52' stroke-width='1.5'/%3E%3Cpolygon points='2,4 18,4 10,25' fill='%233e6e8e'/%3E%3Cpolygon points='22,4 38,4 30,25' fill='%23ffffff' stroke='%236b5f52' stroke-width='0.75'/%3E%3Cpolygon points='42,4 58,4 50,25' fill='%23b8483c'/%3E%3Cpolygon points='62,4 78,4 70,25' fill='%235c7a46'/%3E%3Cpolygon points='82,4 98,4 90,25' fill='%23d9a441'/%3E%3C/svg%3E");
+	--flag-tile-muted: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='40' viewBox='0 0 140 40'%3E%3Cline x1='0' y1='4' x2='140' y2='4' stroke='%236b5f5766' stroke-width='1.5'/%3E%3Cpolygon points='4,6 24,6 14,34' fill='%233e6e8e59'/%3E%3Cpolygon points='30,6 50,6 40,34' fill='%23b8483c59'/%3E%3Cpolygon points='56,6 76,6 66,34' fill='%235c7a4659'/%3E%3Cpolygon points='82,6 102,6 92,34' fill='%23d9a44159'/%3E%3C/svg%3E");
+}
+
+/* ------------------------------------------------------------------ */
+/* Base / reset                                                        */
+/* ------------------------------------------------------------------ */
 
 *,
 *::before,
@@ -40,23 +74,225 @@ Text Domain: uttarakhand-tours
 	box-sizing: border-box;
 }
 
+html {
+	background: var(--ground);
+}
+
 body {
 	margin: 0;
-	font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-	line-height: 1.5;
+	font-family: var(--font-body);
+	font-size: 1rem;
+	line-height: 1.6;
+	color: var(--ink);
+	background: var(--ground);
+	-webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+	font-family: var(--font-display);
+	font-weight: 600;
+	line-height: 1.15;
+	letter-spacing: -0.01em;
+	margin: 0 0 0.5em;
+}
+
+h1 {
+	font-size: clamp(2rem, 5vw, 3.25rem);
+}
+
+h2 {
+	font-size: clamp(1.35rem, 3vw, 1.85rem);
+}
+
+p {
+	margin: 0 0 1em;
+}
+
+a {
+	color: var(--flag-blue);
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.15em;
+}
+
+a:hover {
+	color: var(--flag-red);
 }
 
 img {
 	max-width: 100%;
 	height: auto;
+	display: block;
+}
+
+::selection {
+	background: var(--flag-yellow);
+	color: var(--ink);
+}
+
+:focus-visible {
+	outline: 2px solid var(--flag-red);
+	outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Flag-band signature device                                          */
+/* ------------------------------------------------------------------ */
+
+.flag-band {
+	height: 28px;
+	background-image: var(--flag-tile);
+	background-repeat: repeat-x;
+	background-size: 100px 28px;
+	background-position: left top;
+}
+
+/* Calmer rhythm where content is quieter (footer, non-featured dividers):
+   a larger tile means fewer flags per row, deliberately less dense. */
+.flag-band--calm {
+	background-size: 160px 28px;
+	opacity: 0.75;
+}
+
+/* ------------------------------------------------------------------ */
+/* Site header / footer                                                */
+/* ------------------------------------------------------------------ */
+
+.site-header {
+	background: var(--surface);
+}
+
+.site-header-row {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.75em;
+	max-width: 75em;
+	margin: 0 auto;
+	padding: 1em 1.25em;
+}
+
+@media (min-width: 640px) {
+	.site-header-row {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 1em;
+	}
+}
+
+.site-wordmark {
+	font-family: var(--font-display);
+	font-size: 1.35rem;
+	font-weight: 600;
+	color: var(--ink);
+	text-decoration: none;
+}
+
+.site-wordmark:hover {
+	color: var(--flag-red);
+}
+
+.primary-nav-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75em 1.25em;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+@media (min-width: 640px) {
+	.primary-nav-list {
+		gap: 1.5em;
+	}
+}
+
+.primary-nav-list a {
+	color: var(--ink);
+	text-decoration: none;
+	font-weight: 500;
+}
+
+.primary-nav-list a:hover {
+	color: var(--flag-red);
+}
+
+.site-footer {
+	margin-top: 3em;
+}
+
+.site-footer-row {
+	max-width: 75em;
+	margin: 0 auto;
+	/* Extra bottom clearance so the fixed WhatsApp button (single package
+	   pages) never sits on top of the footer's own text. */
+	padding: 1.5em 1.25em calc(2em + 64px);
+	color: var(--ink-secondary);
+}
+
+@media (min-width: 640px) {
+	.site-footer-row {
+		padding-bottom: calc(2em + 56px);
+	}
+}
+
+.site-footer-wordmark {
+	font-family: var(--font-display);
+	color: var(--ink);
+	font-weight: 600;
+	margin: 0 0 0.25em;
+}
+
+.site-footer-note {
+	margin: 0;
+	font-size: 0.9rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Page content wrapper                                                 */
+/* ------------------------------------------------------------------ */
+
+.homepage-hero,
+.package-archive {
+	max-width: 75em;
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: 1.25em;
+	padding-right: 1.25em;
+}
+
+/* Detail pages (single package, about, contact) get a comfortable content
+   width rather than sprawling to the grid pages' full 75em — a wide,
+   mostly-empty page reads as unfinished, not spacious. */
+article {
+	max-width: 52em;
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: 1.25em;
+	padding-right: 1.25em;
 }
 
 .page-title,
 .package-title {
-	margin: 0.5em 0;
+	margin: 0.75em 0 0.5em;
 }
 
-/* Card grids: single column on mobile, more columns as space allows. */
+.page-content,
+.package-itinerary,
+.package-inclusions,
+.package-exclusions {
+	max-width: 68ch;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* ------------------------------------------------------------------ */
+/* Card grids                                                          */
+/* ------------------------------------------------------------------ */
+
 .package-cards,
 .testimonials-list,
 .sitewide-gallery,
@@ -66,15 +302,83 @@ img {
 	grid-template-columns: 1fr;
 	gap: 1.5em;
 	padding: 0;
-	margin: 1em 0;
+	margin: 1.5em auto;
 	list-style: none;
+	max-width: 75em;
+}
+
+.homepage-featured-packages .package-cards,
+.package-archive .package-cards,
+.sitewide-gallery,
+.popular-regions,
+.trust-badges {
+	padding-left: 1.25em;
+	padding-right: 1.25em;
 }
 
 .package-card,
 .testimonial {
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	padding: 1em;
+	background: var(--surface);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow-soft);
+	padding: 1.25em;
+	transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.package-card:hover {
+	box-shadow: var(--shadow-lift);
+	transform: translateY(-2px);
+}
+
+.package-card-link {
+	text-decoration: none;
+	color: inherit;
+}
+
+.package-card-image-placeholder,
+.package-featured-image-placeholder,
+.testimonial-photo-placeholder {
+	background-color: var(--ground-deep);
+	border-radius: var(--radius);
+}
+
+.package-card-image-placeholder {
+	aspect-ratio: 4 / 3;
+	margin-bottom: 0.75em;
+	background-image: var(--flag-tile-muted);
+	background-repeat: repeat;
+	background-size: 140px 40px;
+}
+
+/* A large hero-scale area reads as messy wallpaper if the small card motif
+   tiles to fill it; one calm, centered row of flags reads as a deliberate
+   string instead. */
+.package-featured-image-placeholder {
+	height: 320px;
+	display: flex;
+	align-items: center;
+	background-image: var(--flag-tile-muted);
+	background-repeat: repeat-x;
+	background-position: center;
+	background-size: 120px 34px;
+}
+
+.testimonial-photo-placeholder {
+	width: 64px;
+	height: 64px;
+	border-radius: 50%;
+}
+
+.package-card img {
+	border-radius: var(--radius);
+	aspect-ratio: 4 / 3;
+	object-fit: cover;
+	margin-bottom: 0.75em;
+}
+
+.package-card-title {
+	font-size: 1.15rem;
+	margin: 0 0 0.4em;
 }
 
 .package-card-regions,
@@ -89,38 +393,320 @@ img {
 	list-style: none;
 }
 
-/* Forms: full-width fields on mobile. */
-.hero-filter-form,
-.package-inquiry-form form,
-.contact-request-form form {
+.package-card-region,
+.package-region {
+	background: color-mix(in srgb, var(--flag-blue) 15%, var(--surface));
+	color: var(--flag-blue);
+	border-radius: var(--radius-pill);
+	padding: 0.2em 0.75em;
+	font-size: 0.8rem;
+	font-weight: 500;
+}
+
+.package-card-theme,
+.package-theme {
+	background: color-mix(in srgb, var(--flag-yellow) 22%, var(--surface));
+	color: color-mix(in srgb, var(--flag-yellow) 65%, var(--ink));
+	border-radius: var(--radius-pill);
+	padding: 0.2em 0.75em;
+	font-size: 0.8rem;
+	font-weight: 500;
+}
+
+.package-card-duration,
+.package-duration {
+	color: var(--ink-secondary);
+	font-size: 0.9rem;
+	margin: 0.25em 0;
+}
+
+.package-card-price,
+.package-price {
+	font-weight: 600;
+	color: var(--ink);
+	margin: 0.25em 0 0;
+}
+
+.package-archive-empty {
+	padding: 2em 1.25em;
+	color: var(--ink-secondary);
+}
+
+/* ------------------------------------------------------------------ */
+/* Testimonials & gallery                                              */
+/* ------------------------------------------------------------------ */
+
+.testimonial {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75em;
+}
+
+.testimonial-photo img {
+	border-radius: 50%;
+	width: 64px;
+	height: 64px;
+	object-fit: cover;
+}
+
+.testimonial-name {
+	font-family: var(--font-display);
+	font-weight: 600;
+	margin: 0;
+}
+
+.testimonial-quote {
+	color: var(--ink-secondary);
+	font-style: italic;
+}
+
+.sitewide-gallery-image img {
+	border-radius: var(--radius);
+	aspect-ratio: 4 / 3;
+	object-fit: cover;
+}
+
+/* ------------------------------------------------------------------ */
+/* Homepage                                                             */
+/* ------------------------------------------------------------------ */
+
+.homepage-hero {
+	padding-top: 3em;
+	padding-bottom: 2.5em;
+}
+
+.homepage-hero h1 {
+	max-width: 20ch;
+}
+
+.hero-filter-form {
 	display: flex;
 	flex-direction: column;
 	gap: 1em;
 	max-width: 40em;
+	margin-top: 1.5em;
 }
 
 .hero-filter-form label {
 	display: flex;
 	flex-direction: column;
-	gap: 0.25em;
+	gap: 0.35em;
+	font-weight: 500;
 }
 
-.homepage-hero {
-	padding: 2em 1em;
+.homepage-featured-packages,
+.homepage-popular-regions,
+.homepage-trust-badges,
+.homepage-testimonials-gallery {
+	padding-top: 1em;
+	padding-bottom: 2.5em;
+}
+
+.trust-badge {
+	background: var(--surface);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow-soft);
+	padding: 1em 1.25em;
+	font-weight: 500;
+	text-align: center;
+}
+
+.popular-region {
+	background: var(--surface);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow-soft);
+	padding: 0.9em 1.25em;
+	text-align: center;
+}
+
+.popular-region a {
+	text-decoration: none;
+	color: var(--ink);
+	font-weight: 500;
+}
+
+.popular-region a:hover {
+	color: var(--flag-red);
+}
+
+/* ------------------------------------------------------------------ */
+/* Single package                                                       */
+/* ------------------------------------------------------------------ */
+
+.package-featured-image img {
+	border-radius: var(--radius);
+}
+
+.package-route-map {
+	height: 400px;
+	border-radius: var(--radius);
+	overflow: hidden;
+}
+
+.package-vehicle-options,
+.package-itinerary,
+.package-inclusions,
+.package-exclusions,
+.package-route,
+.package-inquiry-form {
+	margin: 2em auto;
+}
+
+.package-mountain-advisory {
+	position: relative;
+	background: var(--surface);
+	box-shadow: var(--shadow-soft);
+	border-radius: var(--radius);
+	padding: 2.25em 1.75em 1.75em;
+	max-width: 75em;
+	margin: 2.5em auto;
+}
+
+/* An ink-stamp seal marks the advisory as an official notice, replacing a
+   plain colored-border callout (a banned pattern for this design system). */
+.package-mountain-advisory::before {
+	content: "";
+	position: absolute;
+	top: -16px;
+	right: 28px;
+	width: 52px;
+	height: 52px;
+	border-radius: 50%;
+	background: var(--flag-red);
+	box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--flag-red), var(--shadow-soft);
+	transform: rotate(-8deg);
+}
+
+.package-driver-allowance-included,
+.package-toll-parking-included {
+	font-weight: 500;
+}
+
+/* ------------------------------------------------------------------ */
+/* Forms & buttons                                                      */
+/* ------------------------------------------------------------------ */
+
+.hero-filter-form select,
+.package-inquiry-form input,
+.package-inquiry-form select,
+.contact-request-form input,
+.contact-request-form select,
+.contact-request-form textarea {
+	font-family: var(--font-body);
+	font-size: 1rem;
+	padding: 0.6em 0.75em;
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	background: var(--surface);
+	color: var(--ink);
+}
+
+.package-inquiry-form label,
+.contact-request-form label {
+	display: block;
+	font-weight: 500;
+	margin-bottom: 1em;
+}
+
+.package-inquiry-form input,
+.package-inquiry-form select,
+.contact-request-form input,
+.contact-request-form select,
+.contact-request-form textarea {
+	display: block;
+	margin-top: 0.35em;
+	width: 100%;
+	max-width: 30em;
+}
+
+button,
+input[type="submit"],
+.hero-filter-form button {
+	font-family: var(--font-body);
+	font-weight: 600;
+	font-size: 1rem;
+	color: var(--flag-white);
+	background: var(--flag-red);
+	border: none;
+	border-radius: var(--radius-pill);
+	padding: 0.7em 1.75em;
+	cursor: pointer;
+	transition: background 0.15s ease;
+}
+
+button:hover,
+input[type="submit"]:hover {
+	background: color-mix(in srgb, var(--flag-red) 85%, black);
+}
+
+.whatsapp-floating-button,
+.whatsapp-inquire-cta,
+.whatsapp-contact-cta {
+	display: inline-block;
+	background: var(--flag-green);
+	color: var(--flag-white);
+	text-decoration: none;
+	font-weight: 600;
+	border-radius: var(--radius-pill);
+	padding: 0.7em 1.5em;
+	box-shadow: var(--shadow-soft);
+}
+
+.whatsapp-floating-button:hover,
+.whatsapp-inquire-cta:hover,
+.whatsapp-contact-cta:hover {
+	background: color-mix(in srgb, var(--flag-green) 85%, black);
+	color: var(--flag-white);
+}
+
+.whatsapp-floating-button {
+	position: fixed;
+	bottom: 16px;
+	right: 16px;
+	z-index: 100;
+	/* Smaller footprint on narrow screens: a fixed button inevitably passes
+	   over scrolling content, so keep it as compact as the label allows. */
+	padding: 0.55em 1em;
+	font-size: 0.9rem;
+}
+
+@media (min-width: 640px) {
+	.whatsapp-floating-button {
+		bottom: 20px;
+		right: 20px;
+		padding: 0.7em 1.5em;
+		font-size: 1rem;
+	}
 }
 
 .whatsapp-inquire-cta,
 .whatsapp-contact-cta {
-	display: inline-block;
 	margin: 1em 0;
 }
 
-@media ( min-width: 640px ) {
+/* ------------------------------------------------------------------ */
+/* Contact page                                                         */
+/* ------------------------------------------------------------------ */
+
+.contact-details {
+	margin: 1.5em auto;
+	color: var(--ink-secondary);
+}
+
+.contact-details p {
+	margin: 0.35em 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Responsive breakpoints                                               */
+/* ------------------------------------------------------------------ */
+
+@media (min-width: 640px) {
 	.package-cards,
 	.sitewide-gallery,
 	.popular-regions,
 	.trust-badges {
-		grid-template-columns: repeat( 2, 1fr );
+		grid-template-columns: repeat(2, 1fr);
 	}
 
 	.hero-filter-form {
@@ -128,22 +714,21 @@ img {
 		align-items: flex-end;
 		flex-wrap: wrap;
 	}
+
+	.hero-filter-form label {
+		flex: 1 1 12em;
+	}
 }
 
-@media ( min-width: 1024px ) {
-	body {
-		max-width: 75em;
-		margin: 0 auto;
-	}
-
+@media (min-width: 1024px) {
 	.package-cards,
 	.sitewide-gallery {
-		grid-template-columns: repeat( 3, 1fr );
+		grid-template-columns: repeat(3, 1fr);
 	}
 
 	.popular-regions,
 	.trust-badges,
 	.testimonials-list {
-		grid-template-columns: repeat( 4, 1fr );
+		grid-template-columns: repeat(4, 1fr);
 	}
 }
