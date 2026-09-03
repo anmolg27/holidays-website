@@ -49,33 +49,37 @@ $sitewide_gallery_html  = uttarakhand_tours_render_sitewide_gallery();
 ?>
 
 <section class="homepage-hero">
-	<h1>Discover Uttarakhand</h1>
+	<div class="homepage-hero-inner">
+		<h1>Curated journeys through Garhwal, Kumaon and the Char Dham</h1>
 
-	<form class="hero-filter-form" method="get" action="<?php echo esc_url( $archive_url ); ?>">
-		<label>Region
-			<select name="region">
-				<option value="">Any Region</option>
-				<?php foreach ( $regions as $region ) : ?>
-					<option value="<?php echo esc_attr( $region->slug ); ?>"><?php echo esc_html( $region->name ); ?></option>
-				<?php endforeach; ?>
-			</select>
-		</label>
+		<p class="homepage-hero-lede">One local team arranges the cab, the stay and the day-by-day plan. Tell us where you want to go and we will shape the trip around it.</p>
 
-		<label>Travel Theme
-			<select name="theme">
-				<option value="">Any Theme</option>
-				<?php foreach ( $themes as $theme ) : ?>
-					<option value="<?php echo esc_attr( $theme->slug ); ?>"><?php echo esc_html( $theme->name ); ?></option>
-				<?php endforeach; ?>
-			</select>
-		</label>
+		<form class="hero-filter-form" method="get" action="<?php echo esc_url( $archive_url ); ?>">
+			<label class="hero-filter-field"><span class="hero-filter-label">Region</span>
+				<select name="region">
+					<option value="">Any Region</option>
+					<?php foreach ( $regions as $region ) : ?>
+						<option value="<?php echo esc_attr( $region->slug ); ?>"><?php echo esc_html( $region->name ); ?></option>
+					<?php endforeach; ?>
+				</select>
+			</label>
 
-		<button type="submit">Search Packages</button>
-	</form>
+			<label class="hero-filter-field"><span class="hero-filter-label">Travel Theme</span>
+				<select name="theme">
+					<option value="">Any Theme</option>
+					<?php foreach ( $themes as $theme ) : ?>
+						<option value="<?php echo esc_attr( $theme->slug ); ?>"><?php echo esc_html( $theme->name ); ?></option>
+					<?php endforeach; ?>
+				</select>
+			</label>
+
+			<button type="submit">Find packages</button>
+		</form>
+	</div>
 </section>
 
 <section class="homepage-featured-packages">
-	<h2>Featured Packages</h2>
+	<h2>Featured packages</h2>
 
 	<?php if ( $featured_packages->have_posts() ) : ?>
 		<ul class="package-cards">
@@ -97,7 +101,7 @@ $sitewide_gallery_html  = uttarakhand_tours_render_sitewide_gallery();
 
 <?php if ( ! empty( $regions ) ) : ?>
 	<section class="homepage-popular-regions">
-		<h2>Popular Regions</h2>
+		<h2>Popular regions</h2>
 
 		<ul class="popular-regions">
 			<?php foreach ( $regions as $region ) : ?>
@@ -110,7 +114,7 @@ $sitewide_gallery_html  = uttarakhand_tours_render_sitewide_gallery();
 <?php endif; ?>
 
 <section class="homepage-trust-badges">
-	<h2>Why Travel With Us</h2>
+	<h2>Why travel with us</h2>
 	<ul class="trust-badges">
 		<?php foreach ( $trust_badges as $trust_badge ) : ?>
 			<li class="trust-badge"><?php echo esc_html( $trust_badge ); ?></li>
@@ -121,12 +125,12 @@ $sitewide_gallery_html  = uttarakhand_tours_render_sitewide_gallery();
 <?php if ( $testimonials_html || $sitewide_gallery_html ) : ?>
 	<section class="homepage-testimonials-gallery">
 		<?php if ( $testimonials_html ) : ?>
-			<h2>What Our Travelers Say</h2>
+			<h2>What our travelers say</h2>
 			<?php echo $testimonials_html; ?>
 		<?php endif; ?>
 
 		<?php if ( $sitewide_gallery_html ) : ?>
-			<h2>From Our Trips</h2>
+			<h2>From our trips</h2>
 			<?php echo $sitewide_gallery_html; ?>
 		<?php endif; ?>
 	</section>
