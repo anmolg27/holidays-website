@@ -1795,11 +1795,24 @@ textarea:focus {
 
 /* A contact sheet: tight, square, uniform. Trip photos carry the section,
    so the frame around them stays out of the way. */
-.sitewide-gallery,
+/* A repetition count is worked out from the track's max whenever that max
+   is a definite length, so a fixed ceiling caps the column count and leaves
+   the tail of every row empty. 1fr moves the count onto the minimum instead
+   and lets the tracks absorb the full width. */
+.sitewide-gallery {
+	display: grid;
+	grid-template-columns: repeat( auto-fill, minmax( min( 100%, 10rem ), 1fr ) );
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* The [gallery] shortcode renders at WordPress's thumbnail size, so these
+   tracks stay near it rather than upscaling a 150px crop across a column. */
 .package-gallery .gallery {
 	display: grid;
-	grid-template-columns: repeat( auto-fit, minmax( min( 100%, 9rem ), 14rem ) );
-	justify-content: start;
+	grid-template-columns: repeat( auto-fill, minmax( min( 100%, 9rem ), 1fr ) );
 	gap: 6px;
 	margin: 0;
 	padding: 0;
@@ -1810,6 +1823,13 @@ textarea:focus {
 .package-gallery .gallery-item {
 	margin: 0 !important;
 	width: auto !important;
+}
+
+/* Clipping and rounding live on the link, so its focus ring is not cut off
+   by an overflow-hidden ancestor. */
+.sitewide-gallery-link,
+.package-gallery .gallery-icon a {
+	display: block;
 	overflow: hidden;
 	border-radius: var( --ut-radius-s );
 }
@@ -1824,7 +1844,7 @@ textarea:focus {
 	transition: transform var( --ut-slow ) var( --ut-ease );
 }
 
-.sitewide-gallery-image:hover img,
+.sitewide-gallery-link:hover img,
 .package-gallery .gallery-item:hover img {
 	transform: scale( 1.06 );
 }
@@ -1886,7 +1906,7 @@ textarea:focus {
 	}
 
 	.package-card:hover .package-card-link img,
-	.sitewide-gallery-image:hover img,
+	.sitewide-gallery-link:hover img,
 	.package-gallery .gallery-item:hover img {
 		transform: none;
 	}
