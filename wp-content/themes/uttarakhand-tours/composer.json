@@ -14,7 +14,8 @@
 		"yoast/phpunit-polyfills": "^2.0",
 		"wp-phpunit/wp-phpunit": "^6.5",
 		"composer/installers": "^2.0",
-		"wpackagist-plugin/advanced-custom-fields": "^6.0"
+		"wpackagist-plugin/advanced-custom-fields": "^6.0",
+		"wpackagist-plugin/contact-form-7": "^5.9"
 	},
 	"config": {
 		"allow-plugins": {

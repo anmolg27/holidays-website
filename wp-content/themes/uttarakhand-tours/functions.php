@@ -7,6 +7,7 @@ require_once __DIR__ . '/inc/post-types.php';
 require_once __DIR__ . '/inc/taxonomies.php';
 require_once __DIR__ . '/inc/acf-fields.php';
 require_once __DIR__ . '/inc/whatsapp.php';
+require_once __DIR__ . '/inc/lead-capture-forms.php';
 
 function uttarakhand_tours_enqueue_styles() {
 	wp_enqueue_style( 'uttarakhand-tours-style', get_stylesheet_uri(), array(), wp_get_theme()->get( 'Version' ) );

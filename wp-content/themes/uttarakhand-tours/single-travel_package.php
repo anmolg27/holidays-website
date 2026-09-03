@@ -3,9 +3,9 @@
  * Single Travel Package template.
  *
  * Renders the full package detail page: itinerary, inclusions/exclusions,
- * pricing, hotel tier, meal plan, vehicle options, gallery, and WhatsApp
- * click-to-chat. Map, advisory callout, and lead-capture forms are out of
- * scope here (tickets 06-08).
+ * pricing, hotel tier, meal plan, vehicle options, gallery, WhatsApp
+ * click-to-chat, and the package inquiry form. Map and advisory callout are
+ * out of scope here (tickets 07-08).
  */
 
 /**
@@ -137,6 +137,14 @@ while ( have_posts() ) :
 		<?php if ( $whatsapp_inquire_link ) : ?>
 			<a class="whatsapp-inquire-cta" href="<?php echo esc_url( $whatsapp_inquire_link ); ?>" target="_blank" rel="noopener noreferrer">Inquire About This Package</a>
 		<?php endif; ?>
+
+		<div class="package-inquiry-form">
+			<h2>Inquire About This Package</h2>
+			<?php
+			// Contact Form 7's own form_html() output — trusted plugin markup, not user input.
+			echo uttarakhand_tours_render_package_inquiry_form( $post_id, $package_title );
+			?>
+		</div>
 	</article>
 
 <?php

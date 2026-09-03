@@ -29,6 +29,15 @@ function uttarakhand_tours_manually_load_acf() {
 tests_add_filter( 'muplugins_loaded', 'uttarakhand_tours_manually_load_acf' );
 
 /**
+ * Loads the Contact Form 7 plugin, the same way it would load if activated
+ * from wp-content/plugins on a live site.
+ */
+function uttarakhand_tours_manually_load_cf7() {
+	require_once dirname( __DIR__, 2 ) . '/vendor/wp-plugins/contact-form-7/wp-contact-form-7.php';
+}
+tests_add_filter( 'muplugins_loaded', 'uttarakhand_tours_manually_load_cf7' );
+
+/**
  * Switches the active theme to Uttarakhand Tours for the duration of the
  * test run, before WordPress finishes loading.
  */
