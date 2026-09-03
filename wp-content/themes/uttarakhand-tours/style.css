@@ -494,12 +494,37 @@ article {
 	font-weight: 500;
 }
 
-.homepage-featured-packages,
+/* Deliberate rhythm rather than one repeated spacing value: the primary
+   content (featured packages) breathes most; "Popular Regions" and "Why
+   Travel With Us" are grouped into one calmer supporting band (same
+   background, sitting close together) distinct from it; the closing
+   testimonials/gallery section gets room before the footer. */
+.homepage-featured-packages {
+	padding-top: 0.5em;
+	padding-bottom: 3em;
+}
+
 .homepage-popular-regions,
-.homepage-trust-badges,
+.homepage-trust-badges {
+	background: var(--surface);
+	padding-top: 1.75em;
+	padding-bottom: 1.75em;
+}
+
+.homepage-popular-regions {
+	border-radius: var(--radius) var(--radius) 0 0;
+	padding-top: 2.25em;
+}
+
+.homepage-trust-badges {
+	border-radius: 0 0 var(--radius) var(--radius);
+	padding-bottom: 2.25em;
+	margin-bottom: 1em;
+}
+
 .homepage-testimonials-gallery {
-	padding-top: 1em;
-	padding-bottom: 2.5em;
+	padding-top: 1.5em;
+	padding-bottom: 3em;
 }
 
 .trust-badge {
@@ -721,14 +746,24 @@ input[type="submit"]:hover {
 }
 
 @media (min-width: 1024px) {
+	body {
+		max-width: 75em;
+		margin: 0 auto;
+	}
+
 	.package-cards,
 	.sitewide-gallery {
 		grid-template-columns: repeat(3, 1fr);
 	}
 
 	.popular-regions,
-	.trust-badges,
-	.testimonials-list {
+	.trust-badges {
 		grid-template-columns: repeat(4, 1fr);
+	}
+
+	/* Testimonial count varies with how many the client has published —
+	   auto-fit so 2 items don't stretch into 2 of 4 empty-looking tracks. */
+	.testimonials-list {
+		grid-template-columns: repeat(auto-fit, minmax(16em, 1fr));
 	}
 }
