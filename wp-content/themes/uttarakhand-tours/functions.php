@@ -11,6 +11,7 @@ require_once __DIR__ . '/inc/lead-capture-forms.php';
 require_once __DIR__ . '/inc/route-map.php';
 require_once __DIR__ . '/inc/testimonials-gallery.php';
 require_once __DIR__ . '/inc/about-fleet-page.php';
+require_once __DIR__ . '/inc/contact-page.php';
 
 function uttarakhand_tours_enqueue_styles() {
 	wp_enqueue_style( 'uttarakhand-tours-style', get_stylesheet_uri(), array(), wp_get_theme()->get( 'Version' ) );
