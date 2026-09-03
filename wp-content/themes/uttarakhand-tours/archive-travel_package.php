@@ -92,6 +92,24 @@ $packages = new WP_Query( $query_args );
 ?>
 
 <div class="package-archive">
+	<header class="package-archive-header">
+		<div>
+			<h1><?php echo esc_html( post_type_archive_title( '', false ) ); ?></h1>
+			<p>Considered routes through Uttarakhand, with transport, stays, and day-by-day plans brought together in one Travel Package.</p>
+		</div>
+		<p class="package-archive-count">
+			<?php
+			echo esc_html(
+				sprintf(
+					/* translators: %s: number of Travel Packages. */
+					_n( '%s Travel Package', '%s Travel Packages', $packages->post_count, 'uttarakhand-tours' ),
+					number_format_i18n( $packages->post_count )
+				)
+			);
+			?>
+		</p>
+	</header>
+
 	<?php if ( $packages->have_posts() ) : ?>
 		<ul class="package-cards">
 			<?php

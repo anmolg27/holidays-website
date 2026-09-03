@@ -37,6 +37,8 @@ $featured_packages = new WP_Query(
 	)
 );
 
+$hero_image_id = ! empty( $featured_packages->posts ) ? get_post_thumbnail_id( $featured_packages->posts[0] ) : 0;
+
 $trust_badges = array(
 	'Verified Drivers',
 	'Sanitized Cabs',
@@ -48,30 +50,55 @@ $testimonials_html      = uttarakhand_tours_render_testimonials();
 $sitewide_gallery_html  = uttarakhand_tours_render_sitewide_gallery();
 ?>
 
-<section class="homepage-hero">
-	<h1>Discover Uttarakhand</h1>
+<section class="homepage-hero" aria-labelledby="homepage-hero-title">
+	<div class="homepage-hero-copy">
+		<p class="homepage-hero-kicker">Road journeys across the middle Himalaya</p>
+		<h1 id="homepage-hero-title">See Uttarakhand at a gentler pace.</h1>
+		<p class="homepage-hero-intro">Curated Travel Packages shaped around mountain roads, trusted stays, and the time each place deserves.</p>
 
-	<form class="hero-filter-form" method="get" action="<?php echo esc_url( $archive_url ); ?>">
-		<label>Region
-			<select name="region">
-				<option value="">Any Region</option>
-				<?php foreach ( $regions as $region ) : ?>
-					<option value="<?php echo esc_attr( $region->slug ); ?>"><?php echo esc_html( $region->name ); ?></option>
-				<?php endforeach; ?>
-			</select>
-		</label>
+		<form class="hero-filter-form" method="get" action="<?php echo esc_url( $archive_url ); ?>">
+			<fieldset>
+				<legend class="screen-reader-text">Find a Travel Package</legend>
 
-		<label>Travel Theme
-			<select name="theme">
-				<option value="">Any Theme</option>
-				<?php foreach ( $themes as $theme ) : ?>
-					<option value="<?php echo esc_attr( $theme->slug ); ?>"><?php echo esc_html( $theme->name ); ?></option>
-				<?php endforeach; ?>
-			</select>
-		</label>
+				<label><span>Region</span>
+					<select name="region">
+						<option value="">Any Region</option>
+						<?php foreach ( $regions as $region ) : ?>
+							<option value="<?php echo esc_attr( $region->slug ); ?>"><?php echo esc_html( $region->name ); ?></option>
+						<?php endforeach; ?>
+					</select>
+				</label>
 
-		<button type="submit">Search Packages</button>
-	</form>
+				<label><span>Travel Theme</span>
+					<select name="theme">
+						<option value="">Any Theme</option>
+						<?php foreach ( $themes as $theme ) : ?>
+							<option value="<?php echo esc_attr( $theme->slug ); ?>"><?php echo esc_html( $theme->name ); ?></option>
+						<?php endforeach; ?>
+					</select>
+				</label>
+
+				<button type="submit">Explore Packages</button>
+			</fieldset>
+		</form>
+	</div>
+
+	<div class="homepage-hero-media" aria-hidden="true">
+		<?php if ( $hero_image_id ) : ?>
+			<?php
+			echo wp_get_attachment_image(
+				$hero_image_id,
+				'large',
+				false,
+				array(
+					'alt'           => '',
+					'fetchpriority' => 'high',
+					'loading'       => 'eager',
+				)
+			);
+			?>
+		<?php endif; ?>
+	</div>
 </section>
 
 <section class="homepage-featured-packages">

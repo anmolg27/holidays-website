@@ -38,10 +38,10 @@ function uttarakhand_tours_render_testimonials() {
 		$photo = has_post_thumbnail( $testimonial ) ? get_the_post_thumbnail( $testimonial, 'thumbnail', array( 'loading' => 'lazy' ) ) : '';
 
 		$items_html .= sprintf(
-			'<li class="testimonial"><div class="testimonial-photo">%s</div><p class="testimonial-name">%s</p><div class="testimonial-quote">%s</div></li>',
+			'<li class="testimonial"><figure><div class="testimonial-photo">%s</div><blockquote class="testimonial-quote">%s</blockquote><figcaption class="testimonial-name">%s</figcaption></figure></li>',
 			$photo,
-			esc_html( get_the_title( $testimonial ) ),
-			wp_kses_post( wpautop( $testimonial->post_content ) )
+			wp_kses_post( wpautop( $testimonial->post_content ) ),
+			esc_html( get_the_title( $testimonial ) )
 		);
 	}
 

@@ -27,35 +27,48 @@ function uttarakhand_tours_render_package_card( $post_id, $lazy = true ) {
 	?>
 	<li class="package-card">
 		<a class="package-card-link" href="<?php echo esc_url( get_permalink( $post_id ) ); ?>">
-			<?php if ( has_post_thumbnail( $post_id ) ) : ?>
-				<?php echo get_the_post_thumbnail( $post_id, 'medium', array( 'loading' => $lazy ? 'lazy' : 'eager' ) ); ?>
-			<?php endif; ?>
-			<h2 class="package-card-title"><?php echo esc_html( get_the_title( $post_id ) ); ?></h2>
+			<div class="package-card-media">
+				<?php if ( has_post_thumbnail( $post_id ) ) : ?>
+					<?php echo get_the_post_thumbnail( $post_id, 'medium', array( 'loading' => $lazy ? 'lazy' : 'eager' ) ); ?>
+				<?php else : ?>
+					<span class="package-card-media-placeholder" aria-hidden="true"></span>
+				<?php endif; ?>
+			</div>
+
+			<div class="package-card-body">
+				<div class="package-card-taxonomies">
+					<?php if ( ! empty( $regions ) && ! is_wp_error( $regions ) ) : ?>
+						<ul class="package-card-regions">
+							<?php foreach ( $regions as $region_term ) : ?>
+								<li class="package-card-region"><?php echo esc_html( $region_term->name ); ?></li>
+							<?php endforeach; ?>
+						</ul>
+					<?php endif; ?>
+
+					<?php if ( ! empty( $themes ) && ! is_wp_error( $themes ) ) : ?>
+						<ul class="package-card-themes">
+							<?php foreach ( $themes as $theme_term ) : ?>
+								<li class="package-card-theme"><?php echo esc_html( $theme_term->name ); ?></li>
+							<?php endforeach; ?>
+						</ul>
+					<?php endif; ?>
+				</div>
+
+				<h2 class="package-card-title"><?php echo esc_html( get_the_title( $post_id ) ); ?></h2>
+
+				<div class="package-card-facts">
+					<?php if ( $package_duration ) : ?>
+						<p class="package-card-duration"><?php echo esc_html( $package_duration ); ?></p>
+					<?php endif; ?>
+
+					<?php if ( $package_price ) : ?>
+						<p class="package-card-price">Starting from &#8377;<?php echo esc_html( number_format_i18n( $package_price ) ); ?></p>
+					<?php endif; ?>
+
+					<span class="package-card-arrow" aria-hidden="true">&#8599;</span>
+				</div>
+			</div>
 		</a>
-
-		<?php if ( ! empty( $regions ) && ! is_wp_error( $regions ) ) : ?>
-			<ul class="package-card-regions">
-				<?php foreach ( $regions as $region_term ) : ?>
-					<li class="package-card-region"><?php echo esc_html( $region_term->name ); ?></li>
-				<?php endforeach; ?>
-			</ul>
-		<?php endif; ?>
-
-		<?php if ( ! empty( $themes ) && ! is_wp_error( $themes ) ) : ?>
-			<ul class="package-card-themes">
-				<?php foreach ( $themes as $theme_term ) : ?>
-					<li class="package-card-theme"><?php echo esc_html( $theme_term->name ); ?></li>
-				<?php endforeach; ?>
-			</ul>
-		<?php endif; ?>
-
-		<?php if ( $package_duration ) : ?>
-			<p class="package-card-duration"><?php echo esc_html( $package_duration ); ?></p>
-		<?php endif; ?>
-
-		<?php if ( $package_price ) : ?>
-			<p class="package-card-price">Starting from &#8377;<?php echo esc_html( number_format_i18n( $package_price ) ); ?></p>
-		<?php endif; ?>
 	</li>
 	<?php
 	return ob_get_clean();
