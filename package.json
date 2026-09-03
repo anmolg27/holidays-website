@@ -1,0 +1,11 @@
+{
+	"name": "uttarakhand-tours-site",
+	"private": true,
+	"scripts": {
+		"wp-env": "wp-env",
+		"test:php": "wp-env run tests-cli --env-cwd=wp-content/themes/uttarakhand-tours vendor/bin/phpunit"
+	},
+	"devDependencies": {
+		"@wordpress/env": "^10.0.0"
+	}
+}

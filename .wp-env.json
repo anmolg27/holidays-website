@@ -1,0 +1,9 @@
+{
+	"core": null,
+	"themes": [
+		"./wp-content/themes/uttarakhand-tours"
+	],
+	"config": {
+		"WP_DEBUG": true
+	}
+}
