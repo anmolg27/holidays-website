@@ -5,3 +5,4 @@
 
 require_once __DIR__ . '/inc/post-types.php';
 require_once __DIR__ . '/inc/taxonomies.php';
+require_once __DIR__ . '/inc/acf-fields.php';

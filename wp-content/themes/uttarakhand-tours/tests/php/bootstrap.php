@@ -1,8 +1,9 @@
 <?php
 /**
  * PHPUnit bootstrap: boots the real WordPress core test suite (via the
- * wp-phpunit/wp-phpunit composer package) and switches to this theme
- * before WordPress loads, so `travel_package` and its taxonomies are
+ * wp-phpunit/wp-phpunit composer package), loads ACF (free) as it would
+ * run as an active plugin, and switches to this theme before WordPress
+ * loads, so `travel_package`, its taxonomies, and its ACF fields are
  * registered exactly as they would be on a live site.
  */
 
@@ -17,6 +18,15 @@ if ( ! $_tests_dir ) {
 }
 
 require_once $_tests_dir . '/includes/functions.php';
+
+/**
+ * Loads the ACF (free) plugin, the same way it would load if activated
+ * from wp-content/plugins on a live site.
+ */
+function uttarakhand_tours_manually_load_acf() {
+	require_once dirname( __DIR__, 2 ) . '/vendor/wp-plugins/advanced-custom-fields/acf.php';
+}
+tests_add_filter( 'muplugins_loaded', 'uttarakhand_tours_manually_load_acf' );
 
 /**
  * Switches the active theme to Uttarakhand Tours for the duration of the
