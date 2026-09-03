@@ -80,10 +80,14 @@ $sitewide_gallery_html  = uttarakhand_tours_render_sitewide_gallery();
 	<?php if ( $featured_packages->have_posts() ) : ?>
 		<ul class="package-cards">
 			<?php
+			$card_index = 0;
 			while ( $featured_packages->have_posts() ) :
 				$featured_packages->the_post();
 
-				echo uttarakhand_tours_render_package_card( get_the_ID() );
+				// First 3 cards are likely above the fold; match core's own
+				// default lazy-loading omit threshold.
+				echo uttarakhand_tours_render_package_card( get_the_ID(), $card_index >= 3 );
+				++$card_index;
 			endwhile;
 			wp_reset_postdata();
 			?>
@@ -106,6 +110,7 @@ $sitewide_gallery_html  = uttarakhand_tours_render_sitewide_gallery();
 <?php endif; ?>
 
 <section class="homepage-trust-badges">
+	<h2>Why Travel With Us</h2>
 	<ul class="trust-badges">
 		<?php foreach ( $trust_badges as $trust_badge ) : ?>
 			<li class="trust-badge"><?php echo esc_html( $trust_badge ); ?></li>

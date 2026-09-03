@@ -95,10 +95,14 @@ $packages = new WP_Query( $query_args );
 	<?php if ( $packages->have_posts() ) : ?>
 		<ul class="package-cards">
 			<?php
+			$card_index = 0;
 			while ( $packages->have_posts() ) :
 				$packages->the_post();
 
-				echo uttarakhand_tours_render_package_card( get_the_ID() );
+				// First 3 cards are likely above the fold; match core's own
+				// default lazy-loading omit threshold.
+				echo uttarakhand_tours_render_package_card( get_the_ID(), $card_index >= 3 );
+				++$card_index;
 			endwhile;
 			?>
 		</ul>

@@ -32,7 +32,10 @@ function uttarakhand_tours_render_testimonials() {
 	$items_html = '';
 
 	foreach ( $testimonials as $testimonial ) {
-		$photo = has_post_thumbnail( $testimonial ) ? get_the_post_thumbnail( $testimonial, 'thumbnail' ) : '';
+		// Explicit loading="lazy": these render from get_posts(), not the main
+		// query loop, so WordPress's automatic lazy-loading heuristic never
+		// sees them (see inc/package-card.php for the same reasoning).
+		$photo = has_post_thumbnail( $testimonial ) ? get_the_post_thumbnail( $testimonial, 'thumbnail', array( 'loading' => 'lazy' ) ) : '';
 
 		$items_html .= sprintf(
 			'<li class="testimonial"><div class="testimonial-photo">%s</div><p class="testimonial-name">%s</p><div class="testimonial-quote">%s</div></li>',
@@ -91,7 +94,7 @@ function uttarakhand_tours_render_sitewide_gallery() {
 	$images_html = '';
 
 	foreach ( $image_ids as $image_id ) {
-		$images_html .= '<li class="sitewide-gallery-image">' . wp_get_attachment_image( $image_id, 'medium' ) . '</li>';
+		$images_html .= '<li class="sitewide-gallery-image">' . wp_get_attachment_image( $image_id, 'medium', false, array( 'loading' => 'lazy' ) ) . '</li>';
 	}
 
 	return '<ul class="sitewide-gallery">' . $images_html . '</ul>';

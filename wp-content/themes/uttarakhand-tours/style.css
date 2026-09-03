@@ -26,3 +26,124 @@ Text Domain: uttarakhand-tours
 	background: #fdf2f0;
 	padding: 1em 1.5em;
 }
+
+/**
+ * Responsive layout, mobile-first (base styles target small screens, then
+ * widened at the tablet/desktop breakpoints below). No UI framework — the
+ * whole site is served by this one stylesheet, kept deliberately light for
+ * 3G/4G mountain connections (see ticket 13).
+ */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+	line-height: 1.5;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+.page-title,
+.package-title {
+	margin: 0.5em 0;
+}
+
+/* Card grids: single column on mobile, more columns as space allows. */
+.package-cards,
+.testimonials-list,
+.sitewide-gallery,
+.popular-regions,
+.trust-badges {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 1.5em;
+	padding: 0;
+	margin: 1em 0;
+	list-style: none;
+}
+
+.package-card,
+.testimonial {
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	padding: 1em;
+}
+
+.package-card-regions,
+.package-card-themes,
+.package-regions,
+.package-themes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5em;
+	padding: 0;
+	margin: 0.5em 0;
+	list-style: none;
+}
+
+/* Forms: full-width fields on mobile. */
+.hero-filter-form,
+.package-inquiry-form form,
+.contact-request-form form {
+	display: flex;
+	flex-direction: column;
+	gap: 1em;
+	max-width: 40em;
+}
+
+.hero-filter-form label {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25em;
+}
+
+.homepage-hero {
+	padding: 2em 1em;
+}
+
+.whatsapp-inquire-cta,
+.whatsapp-contact-cta {
+	display: inline-block;
+	margin: 1em 0;
+}
+
+@media ( min-width: 640px ) {
+	.package-cards,
+	.sitewide-gallery,
+	.popular-regions,
+	.trust-badges {
+		grid-template-columns: repeat( 2, 1fr );
+	}
+
+	.hero-filter-form {
+		flex-direction: row;
+		align-items: flex-end;
+		flex-wrap: wrap;
+	}
+}
+
+@media ( min-width: 1024px ) {
+	body {
+		max-width: 75em;
+		margin: 0 auto;
+	}
+
+	.package-cards,
+	.sitewide-gallery {
+		grid-template-columns: repeat( 3, 1fr );
+	}
+
+	.popular-regions,
+	.trust-badges,
+	.testimonials-list {
+		grid-template-columns: repeat( 4, 1fr );
+	}
+}
