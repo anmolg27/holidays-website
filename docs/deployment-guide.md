@@ -195,7 +195,23 @@ That from-address is a problem. If your domain publishes SPF or DMARC records �
 
 **Then test properly:** submit the inquiry form on a live package page *and* the Custom Package Request form on the Contact page, and confirm both arrive in the real inbox — not just that the success message appears. Check the spam folder too.
 
-Consider a form-entry database plugin as a backstop, so a mail outage never loses a lead outright.
+### Install Flamingo as a backstop
+
+**Contact Form 7 stores nothing.** No database table, no admin screen. The email *is* the record, so a message that bounces, lands in spam, or hits a misconfigured mail server is gone permanently.
+
+[Flamingo](https://wordpress.org/plugins/flamingo/) is free, by the same author as Contact Form 7, and needs no configuration: **Plugins → Add New → Flamingo → Install → Activate.** Submissions then appear under **Flamingo → Inbound Messages**, with contacts collected in **Address Book**.
+
+Crucially, it captures submissions *even when mail fails*. From Contact Form 7's own `modules/flamingo.php`:
+
+```php
+$cases = (array) apply_filters( 'wpcf7_flamingo_submit_if',
+	array( 'spam', 'mail_sent', 'mail_failed' )
+);
+```
+
+So install it **before** troubleshooting SMTP, not after — every inquiry that arrives while mail is broken is still captured.
+
+Two caveats: it is not retroactive, so anything submitted before activation is unrecoverable; and its Address Book keys on email, which the seeded forms leave optional. A traveller who leaves only a phone number still produces a complete Inbound Message, they just may not appear as a named contact.
 
 ---
 
@@ -231,6 +247,8 @@ Some homepage and footer copy lives in the template files rather than the admin 
 - [ ] `/travel-packages/` loads and filtering by region and theme works
 - [ ] A package page shows price, itinerary, inclusions, route map, and advisory
 - [ ] **Both forms deliver to a real monitored inbox** (verified by actual submission)
+- [ ] Both forms ask for the visitor's name and phone — a lead you cannot contact is not a lead
+- [ ] Flamingo is active and the test submission appears under Inbound Messages
 - [ ] WhatsApp buttons open a chat with the correct number
 - [ ] Header and footer menus are assigned
 - [ ] "Discourage search engines" is unticked
@@ -270,9 +288,76 @@ For theme updates:
 4. Clear any page cache.
 5. Reload the live site and confirm the change.
 
-Template changes rarely need anything more. Re-activating the theme is only necessary to re-seed missing pages, terms, or forms — it is safe, but not part of a routine deploy.
+Uploading a zip over an existing install shows a comparison table — *Current* vs *Uploaded*, with both version numbers. Choose **Replace current with uploaded**. The theme stays active; you do not re-activate it.
+
+### What a theme update does not do
+
+`after_switch_theme` does **not** fire on an update, so nothing is re-seeded. Pages, taxonomy terms, Customizer settings and Contact Form 7 forms are all left exactly as they are. That is usually what you want — it is why an update can never duplicate content or trample a client's edits.
+
+The consequence catches people out: **changing a seeded form's template in code does not change the form on a live site.** The form already exists, and even a full re-activation skips it by design. To bring an existing site in line with an updated template:
+
+1. Deploy the new theme version first
+2. **Contact → Contact Forms** — delete the affected forms
+3. Switch to any other theme, then back to Uttarakhand Tours
+
+The forms are recreated from the current template. Every other seeder skips what already exists, so nothing duplicates. Do this before configuring SMTP and editing the mail From addresses, since re-seeding resets those to the default.
+
+### After every deploy
+
+- **Purge the page cache.** LiteSpeed Cache (preinstalled on many hosts) will otherwise serve the old stylesheet: **LiteSpeed Cache → Toolbox → Purge All.**
+- **Verify the version actually landed:**
+
+  ```bash
+  curl -s https://yourdomain.com/ | grep -o 'style.css?ver=[0-9.]*'
+  ```
+
+  If that still reports the old number, the upload or the cache purge did not take.
 
 If you add a custom post type, taxonomy, or rewrite rule, visit **Settings → Permalinks** and save once afterwards to flush rewrite rules.
+
+---
+
+## Appendix: Hostinger
+
+Notes specific to Hostinger's hPanel, where this site is deployed.
+
+### Where things live
+
+| Task | hPanel path |
+| --- | --- |
+| PHP version | Websites → Dashboard → **Advanced → PHP Configuration** |
+| SSH access | Websites → Dashboard → **Advanced → SSH Access** — [Premium Web plans and above](https://www.hostinger.com/support/1583645-how-to-enable-ssh-access-in-hostinger/); off by default |
+| Git deployment | Websites → Dashboard → **Advanced → Git** |
+| File Manager | Files → **File Manager** |
+| Mailboxes | **Emails** |
+| SSL | Websites → Dashboard → **Security → SSL** |
+| Extra sites | Websites → **+ Add Website** |
+
+### Use the zip upload, not Git
+
+Hostinger's [Git auto-deploy](https://www.hostinger.com/support/1583302-how-to-deploy-a-git-repository-in-hostinger/) pulls a whole repository into one target directory. **This repository's root is not the theme root** — the theme lives at `wp-content/themes/uttarakhand-tours/`. Pointing Git deploy at the theme directory would drop `package.json`, `docs/` and a nested `wp-content/` tree inside it.
+
+The theme is 40 KB with no build step, so `npm run build:theme` plus **Appearance → Themes → Upload Theme** takes under a minute. If push-to-deploy becomes worthwhile later, the clean route is a separate repository containing only the theme.
+
+### SMTP
+
+Hostinger includes email, which makes step 5 straightforward. Create a mailbox under **Emails**, then point an SMTP plugin at it:
+
+| Field | Value |
+| --- | --- |
+| Host | `smtp.hostinger.com` |
+| Port | `587` (TLS, preferred) or `465` (SSL) |
+| Encryption | Match the port |
+| Authentication | On |
+| Username | the full email address |
+| Password | that mailbox's password |
+
+Hostinger's own guide: [WordPress SMTP setup](https://www.hostinger.com/tutorials/wordpress-smtp/).
+
+### Two gotchas on a fresh install
+
+- **"Coming soon" mode.** New sites ship with a placeholder enabled via the Hostinger Tools plugin. If the front end shows a holding page instead of the homepage, turn it off there.
+- **LiteSpeed Cache is preinstalled.** Keep it, but purge after every theme deploy and after publishing a package, or the archive keeps serving the old list.
 
 ---
 
@@ -285,6 +370,10 @@ If you add a custom post type, taxonomy, or rewrite rule, visit **Settings → P
 **No inquiry form on package pages** — Contact Form 7 is inactive, or the forms were never seeded. Check **Contact → Contact Forms** for "Package Inquiry" and "Custom Package Request"; re-activate the theme if absent.
 
 **Forms submit but no email arrives** — see step 5. This is almost always SMTP.
+
+**"There was an error trying to send your message"** — Contact Form 7's `mail_failed`: `wp_mail()` returned false, so PHP `mail()` is disabled or blocked on the host. Nothing was sent and, without Flamingo, nothing was stored. Configure SMTP (step 5). Use the SMTP plugin's own test tool first, since it reports the real error rather than Contact Form 7's generic message.
+
+**A form is missing fields that the theme template has** — the form was created from an older version of the template and updates never overwrite existing forms. Either add the fields by hand in the form editor, or delete and re-seed (step 10).
 
 **The route map is blank** — the package has no Route Stops, or the lines are malformed. The format is `Place Name | latitude, longitude`, one stop per line; invalid lines are skipped. The map also needs outbound access to `unpkg.com`.
 
