@@ -37,7 +37,7 @@ function uttarakhand_tours_seed_lead_capture_forms() {
 				'mail' => array(
 					'subject'            => '[_site_title] Package Inquiry: [package-title]',
 					'sender'             => '[_site_title] <wordpress@[_site_url]>',
-					'body'               => "New package inquiry received.\n\nPackage: [package-title] (ID: [package-id])\nTravel Date: [travel-date]\nPassengers: [passenger-count]\nPreferred Vehicle: [preferred-vehicle]",
+					'body'               => "New package inquiry received.\n\nFrom: [your-name]\nPhone / WhatsApp: [your-phone]\nEmail: [your-email]\n\nPackage: [package-title] (ID: [package-id])\nTravel Date: [travel-date]\nPassengers: [passenger-count]\nPreferred Vehicle: [preferred-vehicle]",
 					'recipient'          => '[_site_admin_email]',
 					'additional_headers' => '',
 					'attachments'        => '',
@@ -57,7 +57,7 @@ function uttarakhand_tours_seed_lead_capture_forms() {
 				'mail' => array(
 					'subject'            => '[_site_title] Custom Package Request',
 					'sender'             => '[_site_title] <wordpress@[_site_url]>',
-					'body'               => "New custom package request received.\n\nRegion: [region]\nTravel Start Date: [travel-start-date]\nDuration: [travel-duration]\nPassengers: [passenger-count]\nVehicle Preference: [vehicle-preference]\nAccommodation Tier: [accommodation-tier]\nNotes:\n[notes]",
+					'body'               => "New custom package request received.\n\nFrom: [your-name]\nPhone / WhatsApp: [your-phone]\nEmail: [your-email]\n\nRegion: [region]\nTravel Start Date: [travel-start-date]\nDuration: [travel-duration]\nPassengers: [passenger-count]\nVehicle Preference: [vehicle-preference]\nAccommodation Tier: [accommodation-tier]\nNotes:\n[notes]",
 					'recipient'          => '[_site_admin_email]',
 					'additional_headers' => '',
 					'attachments'        => '',
@@ -81,6 +81,15 @@ function uttarakhand_tours_package_inquiry_form_template() {
 		'[hidden package-id default:shortcode_attr]
 [hidden package-title default:shortcode_attr]
 
+<label>Your Name
+    [text* your-name] </label>
+
+<label>Mobile / WhatsApp Number
+    [tel* your-phone] </label>
+
+<label>Email (optional)
+    [email your-email] </label>
+
 <label>Travel Date
     [date* travel-date] </label>
 
@@ -102,7 +111,16 @@ function uttarakhand_tours_package_inquiry_form_template() {
  */
 function uttarakhand_tours_custom_package_request_form_template() {
 	return sprintf(
-		'<label>Region
+		'<label>Your Name
+    [text* your-name] </label>
+
+<label>Mobile / WhatsApp Number
+    [tel* your-phone] </label>
+
+<label>Email (optional)
+    [email your-email] </label>
+
+<label>Region
     [select* region "%1$s"] </label>
 
 <label>Travel Start Date

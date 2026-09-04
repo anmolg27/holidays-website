@@ -18,12 +18,36 @@ This assumes ordinary WordPress hosting — shared hosting with cPanel, a manage
 | PHP extensions | GD or Imagick **with WebP support** | Imagick |
 | HTTPS | Required | — |
 
-WebP matters: `inc/performance.php` converts generated image sub-sizes to WebP. Without WebP support in the image library, WordPress falls back to JPEG/PNG — the site still works, images are just heavier. Check under **Tools → Site Health → Info → Media Handling**.
+Why each of these is here:
+
+- **PHP 7.4** is the theme's floor; 8.1+ is materially faster.
+- **WordPress 6.3** is required because `inc/route-map.php` passes a `strategy` argument to `wp_enqueue_script()`, which was added in 6.3.
+- **WebP** matters because `inc/performance.php` converts generated image sub-sizes to WebP. Without it the site still works — images just stay JPEG/PNG and weigh more, which is exactly the wrong trade on the connections this site targets.
+- **MySQL/MariaDB** is WordPress's own floor; the theme adds no requirement.
 
 Required plugins, both free from the WordPress.org directory:
 
 - **Advanced Custom Fields** — the package detail fields. Without it, packages lose price, duration, itinerary, route, and advisory.
 - **Contact Form 7** — both lead-capture forms.
+
+### Verifying all of this from wp-admin
+
+Nearly everything is on one screen: **Tools → Site Health → Info** (`/wp-admin/site-health.php?tab=debug`). Expand the panels below.
+
+| Requirement | Panel | Field |
+| --- | --- | --- |
+| PHP version | **Server** | `PHP version` |
+| WordPress version | **WordPress** | `Version` — also in the bottom-right of any admin page |
+| Database version | **Database** | `Server version` |
+| WebP support | **Media Handling** | `Active editor`, then `ImageMagick supported file formats` or `GD supported file formats` — look for **WEBP** |
+| HTTPS | **WordPress** | `Is this site using HTTPS?` |
+| Required plugins | **Active Plugins** | Advanced Custom Fields and Contact Form 7 both listed |
+
+Check the **Status** tab (`/wp-admin/site-health.php`) too — it proactively flags outdated PHP, missing PHP modules, and a broken REST API, so it usually names the problem before you go looking for it.
+
+The Info tab's **"Copy site info to clipboard"** button dumps the whole report as text, which is the fastest way to hand it to your host or a developer.
+
+Falling short? PHP version and image libraries are host-level settings, not WordPress ones — on cPanel look for **Select PHP Version** or **MultiPHP Manager**, otherwise ask the host. WordPress itself updates from **Dashboard → Updates**.
 
 ---
 
@@ -71,9 +95,43 @@ rsync -avz --delete \
 
 > `--delete` removes server files absent from your copy. Run once with `--dry-run` first.
 
-### Option C — zip upload
+### Option C — zip upload (simplest, works on every host)
 
-Copy the theme folder, delete the excluded paths from the copy, zip it, and upload via **Appearance → Themes → Add New → Upload Theme**.
+Build the zip from the project root:
+
+```bash
+npm run build:theme
+```
+
+That produces `uttarakhand-tours.zip` (~40 KB) in the project root, with `vendor/`, `tests/`, and the Composer/PHPUnit files stripped out. It overwrites any previous build, so run it again after every change — `zip` appends to an existing archive rather than replacing it, which is why the script deletes the old file first.
+
+Then upload via **Appearance → Themes → Add New → Upload Theme → Activate**.
+
+The archive is gitignored — it is a build artifact, not source.
+
+<details>
+<summary>Doing it by hand instead</summary>
+
+The zip must contain **one top-level folder** named `uttarakhand-tours`, with `style.css` directly inside it. WordPress rejects the upload otherwise.
+
+Do **not** right-click the theme folder and compress it as-is: that ships `vendor/` (the entire PHPUnit toolchain plus duplicate copies of ACF and Contact Form 7) and `tests/` to your public server. Copy the folder first, delete the excluded paths listed above from the copy, then compress the copy.
+
+The equivalent command is:
+
+```bash
+cd wp-content/themes
+zip -rq ../../uttarakhand-tours.zip uttarakhand-tours \
+  -x 'uttarakhand-tours/vendor/*' \
+     'uttarakhand-tours/tests/*' \
+     'uttarakhand-tours/composer.*' \
+     'uttarakhand-tours/phpunit.xml.dist' \
+     'uttarakhand-tours/.phpunit.result.cache' \
+     '*/.DS_Store'
+```
+
+</details>
+
+When re-uploading an updated theme, WordPress asks to replace the existing one. That is fine — but bump `Version:` in `style.css` first, or returning visitors keep the cached old stylesheet (see step 10).
 
 ---
 

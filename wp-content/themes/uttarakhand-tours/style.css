@@ -3,7 +3,7 @@ Theme Name: Uttarakhand Tours
 Theme URI: https://example.com
 Author: Uttarakhand Tours
 Description: Custom theme for an Uttarakhand travel and tour company. Classic (non-FSE) theme per ADR-0001, built around the Travel Package custom post type.
-Version: 0.1.0
+Version: 0.1.3
 Requires PHP: 7.4
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -1524,20 +1524,50 @@ textarea:focus {
 	gap: var( --ut-space-m );
 }
 
-.package-inquiry-form form p,
-.contact-request-form form p {
+/* Only the form's own rows are spaced by its grid gap. Paragraphs nested
+   deeper — inside a fieldset a client has added in the CF7 editor — are not
+   grid items and still need their own rhythm. */
+.package-inquiry-form form > p,
+.contact-request-form form > p {
 	margin: 0;
 }
 
+.package-inquiry-form fieldset p,
+.contact-request-form fieldset p {
+	margin: 0 0 var( --ut-space-m );
+}
+
+.package-inquiry-form fieldset p:last-child,
+.contact-request-form fieldset p:last-child {
+	margin-bottom: 0;
+}
+
+/* Block, not grid. A grid label promotes every inline child to its own row,
+   so a label like `Email <span>(optional)</span><br>` breaks into three
+   stacked rows instead of one line. Blocks let inline markup stay inline
+   and let the control below it sit on its own line. */
 .package-inquiry-form label,
 .contact-request-form label {
-	display: grid;
-	gap: 0.4rem;
+	display: block;
 	color: var( --ut-slate-500 );
 	font-size: var( --ut-step--2 );
 	font-weight: 700;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
+}
+
+/* Contact Form 7 wraps every named field in this span. Making it a block
+   puts the control under its label without relying on the <br> CF7 emits. */
+.package-inquiry-form .wpcf7-form-control-wrap,
+.contact-request-form .wpcf7-form-control-wrap {
+	display: block;
+	margin-top: 0.4rem;
+}
+
+/* That <br> is then a redundant empty line. */
+.package-inquiry-form label br,
+.contact-request-form label br {
+	display: none;
 }
 
 /* The label carries the micro-label treatment; the control must not. */
@@ -1628,9 +1658,15 @@ textarea:focus {
 	font-size: var( --ut-step--1 );
 }
 
+/* Every non-success state, including `failed` and `aborted` — a mail
+   delivery failure must not render in the neutral notice style, or a lost
+   lead looks like an informational message. */
 .wpcf7 form.invalid .wpcf7-response-output,
 .wpcf7 form.unaccepted .wpcf7-response-output,
-.wpcf7 form.payment-required .wpcf7-response-output {
+.wpcf7 form.payment-required .wpcf7-response-output,
+.wpcf7 form.failed .wpcf7-response-output,
+.wpcf7 form.aborted .wpcf7-response-output,
+.wpcf7 form.spam .wpcf7-response-output {
 	background: #fbeeeb;
 	border-left-color: var( --ut-alert ) !important;
 	color: #6d2114;

@@ -3,7 +3,8 @@
 	"private": true,
 	"scripts": {
 		"wp-env": "wp-env",
-		"test:php": "wp-env run tests-cli --env-cwd=wp-content/themes/uttarakhand-tours vendor/bin/phpunit"
+		"test:php": "wp-env run tests-cli --env-cwd=wp-content/themes/uttarakhand-tours vendor/bin/phpunit",
+		"build:theme": "rm -f uttarakhand-tours.zip && cd wp-content/themes && zip -rq ../../uttarakhand-tours.zip uttarakhand-tours -x 'uttarakhand-tours/vendor/*' 'uttarakhand-tours/tests/*' 'uttarakhand-tours/composer.*' 'uttarakhand-tours/phpunit.xml.dist' 'uttarakhand-tours/.phpunit.result.cache' '*/.DS_Store'"
 	},
 	"devDependencies": {
 		"@wordpress/env": "^10.0.0"
