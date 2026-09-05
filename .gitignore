@@ -1,0 +1,25 @@
+# Secrets — this repo will hold a Google service account key and a deploy hook URL
+.env
+.env.*
+!.env.example
+*.pem
+service-account*.json
+
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+.open-next/
+out/
+dist/
+
+# Cloudflare local state
+.wrangler/
+
+# Tool artifacts
+.playwright-mcp/
+*.log
+
+# macOS
+.DS_Store
