@@ -13,6 +13,7 @@ node_modules/
 .open-next/
 out/
 dist/
+*.tsbuildinfo
 
 # Cloudflare local state
 .wrangler/
