@@ -17,6 +17,8 @@ dist/
 
 # Cloudflare local state
 .wrangler/
+.dev.vars
+.dev.vars.*
 
 # Tool artifacts
 .playwright-mcp/
