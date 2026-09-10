@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-10T00:00:00.000Z",
+  "title": "Design System: Uttarakhand Tours",
+  "extensions": {
+    "colorMeta": {
+      "cover": { "role": "primary", "displayName": "Marigold cover", "canonical": "#E8B52A" },
+      "alta": { "role": "primary", "displayName": "Sindoor stamp", "canonical": "#9C1C16" },
+      "pine": { "role": "secondary", "displayName": "Deodar pine", "canonical": "#1A4336" },
+      "ink": { "role": "neutral", "displayName": "Offset ink", "canonical": "#1B1F24" },
+      "paper": { "role": "neutral", "displayName": "Newsprint", "canonical": "#E4E6E1" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Home cover title only." },
+      "body": { "displayName": "Body", "purpose": "Reading copy on newsprint and cover." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "ease", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Button state transitions." },
+      { "name": "duration", "value": "160ms", "purpose": "Short press and hover." }
+    ],
+    "breakpoints": [
+      { "name": "card-grid", "value": "40rem" },
+      { "name": "desktop-nav", "value": "48rem" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Sindoor stamp. The one action on a page.",
+      "html": "<button class=\"button button-primary\">See Travel Packages</button>",
+      "css": ".button-primary { background: #9c1c16; color: #fff; min-height: 2.75rem; padding: 0.7rem 1.25rem; border-radius: 2px; font-weight: 700; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "A booklet plate. Newsprint, hairline, no lift.",
+      "html": "<article class=\"card\"><h3 class=\"card-title\">Title</h3></article>",
+      "css": ".card { background: #e4e6e1; border: 1px solid #8a8f88; border-radius: 4px; padding: 1.5rem; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Yatra Booklet",
+    "overview": "The site is a cheap offset-printed Char Dham yatra booklet, not a mountain-hero travel template. Cover is marigold; interior pages are newsprint. Trust is the product.",
+    "keyCharacteristics": [
+      "Marigold cover, newsprint interior, sindoor stamp for the one action",
+      "Rasa titles, Atkinson Hyperlegible body",
+      "Bound plates with hairline rules; no drop shadows",
+      "Mobile-first, one CSS file, no UI framework"
+    ],
+    "rules": [
+      { "name": "The Cover Rule", "body": "Marigold is a field, not an accent chip.", "section": "colors" },
+      { "name": "The Stamp Rule", "body": "Sindoor is the one action.", "section": "colors" },
+      { "name": "The Two-Voice Rule", "body": "Rasa for titles; Atkinson for reading and controls.", "section": "typography" },
+      { "name": "The Plate Rule", "body": "Cards are booklet plates. Do not lift or nest them.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do start from the phone width and expand.",
+      "Do consume colour, type, and space from tokens.",
+      "Do keep motion behind prefers-reduced-motion."
+    ],
+    "donts": [
+      "Don't ship a mountain-hero + serif + terracotta travel template.",
+      "Don't put a kicker or eyebrow above a heading.",
+      "Don't introduce a UI framework or a third font family."
+    ]
+  }
+}

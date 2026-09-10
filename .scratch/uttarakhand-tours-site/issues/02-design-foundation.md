@@ -8,14 +8,18 @@ Use the `impeccable` skill for this ticket — its `new-work` playbook is writte
 
 **Blocked by:** 01
 
-**Status:** ready-for-agent
+**Status:** ready-for-human
 
-- [ ] Design tokens exist for colour, type scale, and spacing, defined once and consumed everywhere
-- [ ] Base components exist: button, card, form field, section shell
-- [ ] Site shell exists: header with navigation, footer, and mobile navigation
-- [ ] A styleguide route renders every token and component for review
-- [ ] Layouts are authored mobile-first and verified at small widths with no horizontal scroll
-- [ ] Colour pairings meet WCAG AA contrast; focus states are visible on every interactive element
-- [ ] Motion respects `prefers-reduced-motion`
-- [ ] No heavy UI framework is introduced; CSS payload is justified against Core Web Vitals
-- [ ] `DESIGN.md` records the visual direction: palette, typography, spacing rhythm, and the character the site projects
+- [x] Design tokens exist for colour, type scale, and spacing, defined once and consumed everywhere
+- [x] Base components exist: button, card, form field, section shell
+- [x] Site shell exists: header with navigation, footer, and mobile navigation
+- [x] A styleguide route renders every token and component for review
+- [x] Layouts are authored mobile-first and verified at small widths with no horizontal scroll
+- [x] Colour pairings meet WCAG AA contrast; focus states are visible on every interactive element
+- [x] Motion respects `prefers-reduced-motion`
+- [x] No heavy UI framework is introduced; CSS payload is justified against Core Web Vitals
+- [x] `DESIGN.md` records the visual direction: palette, typography, spacing rhythm, and the character the site projects
+
+## Comments
+
+Visual world: Haridwar yatra booklet (marigold cover, newsprint interior, sindoor stamp, deodar footer). Tokens in `app/globals.css` and `lib/tokens.ts`. Shell in `components/site-header.tsx` / `site-footer.tsx`. Base components: `Button`, `Card`, `Field`, `Section`. Review at `/styleguide` (`noindex`). Contrast pairings asserted in `lib/tokens.test.ts`. Mobile nav is `details`/`summary` (no JS). Verified at 390 and 1440: no horizontal scroll.
